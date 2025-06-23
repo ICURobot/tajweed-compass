@@ -52,6 +52,7 @@
             roadmapSteps: [
                 { id: 'step1', title: 'The Foundation', description: "Start with the essential principles...", lessons: ['The Meaning of Tajweed', 'The Isti\'adha & Basmala', 'The Kinds of Mistakes (Lahn)'] },
                 { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran...", lessons: ['Makharij al-Huruf', 'Heavy vs. Light Letters', 'Sun & Moon Letters'] },
+                { id: 'step3', title: 'Vowels & Markings', description: "Discover how small markings guide the entire flow and sound of your recitation.", lessons: ['Harakat (Fathah, Dammah, Kasrah)', 'Sukun, Shaddah, and Tanween'] },
             ],
             toolkitItems: []
         };
@@ -197,7 +198,11 @@
 
             const handleStepClick = async (stepId) => {
                 if (!db || !doc) return alert("Database not connected.");
-                const lessonIdMap = { 'step1': 'step1_foundation', 'step2': 'step2_letters' };
+                const lessonIdMap = { 
+                    'step1': 'step1_foundation', 
+                    'step2': 'step2_letters',
+                    'step3': 'step3_vowels', // Added Step 3
+                };
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
                 
@@ -215,11 +220,10 @@
             const handleShowDetails = async (stepId) => {
                  if (!db || !doc) return alert("Database not connected.");
                 
-                // ** THE ONLY CHANGE IS HERE **
-                // We add the new lesson to this map.
                 const detailIdMap = { 
                     'step1': 'step1_foundation_details',
-                    'step2': 'step2_letters_details', // Added Step 2
+                    'step2': 'step2_letters_details',
+                    'step3': 'step3_vowels_details', // Added Step 3
                 };
 
                 const detailId = detailIdMap[stepId];
