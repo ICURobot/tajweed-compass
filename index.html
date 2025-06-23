@@ -20,11 +20,9 @@
     
     <!-- Firebase SDKs -->
     <script type="module">
-        // Import all necessary functions from Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Your actual Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAUrt-0tl_wj275YGQyRhyGYmMWTGs0BSM",
             authDomain: "tajweed-compass.firebaseapp.com",
@@ -35,19 +33,10 @@
             measurementId: "G-MN26V7G16H"
         };
         
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // ** THE FIX **
-        // Make all necessary Firebase tools globally available under a single object
-        window.firebaseSDK = {
-            db,
-            collection,
-            getDocs,
-            doc,
-            getDoc
-        };
+        window.firebaseSDK = { db, collection, getDocs, doc, getDoc };
     </script>
     
     <style>
@@ -67,11 +56,8 @@
     <script type="text/babel">
         const { useState, useEffect, StrictMode } = React;
         
-        // ** THE FIX **
-        // Destructure the globally available Firebase tools for use in our components
         const { db, collection, getDocs, doc, getDoc } = window.firebaseSDK || {};
 
-        // --- Default Data (Fallback) ---
         const defaultTajweedData = {
             roadmapSteps: [
                 { id: 'step1', title: 'The Foundation', description: "Start with the essential principles...", lessons: ['The Meaning of Tajweed', 'The Isti\'adha & Basmala', 'The Kinds of Mistakes (Lahn)'] },
@@ -107,8 +93,6 @@
             );
         }
 
-        function Footer({ setPage }) { /* ... same as before ... */ }
-
         function RoadmapStep({ step, index, onStepClick }) {
             const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100'];
             const cardColor = colors[index % colors.length];
@@ -132,73 +116,8 @@
             );
         }
         
-        function HomePage({ roadmapSteps, onStepClick }) { /* ... same as before ... */ }
-        
-        // --- Main App Component ---
-        function App() {
-            const [page, setPage] = useState('home');
-            const [data, setData] = useState(defaultTajweedData);
-            const [loading, setLoading] = useState(true);
-            const [activeLesson, setActiveLesson] = useState(null);
-
-            useEffect(() => {
-                async function fetchSummaryData() {
-                    // Check if db and collection functions are available
-                    if (db && collection) {
-                        try {
-                            const roadmapCol = collection(db, "roadmapSteps");
-                            const roadmapSnapshot = await getDocs(roadmapCol);
-                            const roadmapList = roadmapSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            if (roadmapList.length > 0) {
-                                roadmapList.sort((a, b) => a.order - b.order);
-                                setData(prevData => ({ ...prevData, roadmapSteps: roadmapList }));
-                            }
-                        } catch (error) { console.error("Error fetching summaries:", error); }
-                    }
-                    setLoading(false);
-                }
-                fetchSummaryData();
-            }, []);
-
-            const handleStepClick = async (stepId) => {
-                // Check if db and doc functions are available
-                if (!db || !doc) {
-                    alert("Database not connected properly.");
-                    return;
-                }
-                const lessonId = stepId === 'step1' ? 'step1_foundation' : stepId;
-                const lessonRef = doc(db, "lessons", lessonId);
-                
-                try {
-                    const docSnap = await getDoc(lessonRef);
-                    if (docSnap.exists()) {
-                        setActiveLesson(docSnap.data());
-                    } else {
-                        console.log("No such lesson found!");
-                        alert("Lesson content not found in the database.");
-                    }
-                } catch (error) {
-                    console.error("Error fetching lesson:", error);
-                    alert("Could not load the lesson.");
-                }
-            };
-            
-            const handleCloseModal = () => setActiveLesson(null);
-
-            return (
-                <StrictMode>
-                    <LessonModal lesson={activeLesson} onClose={handleCloseModal} />
-                    <Header setPage={setPage} />
-                    <main>
-                        {page === 'home' && <HomePage roadmapSteps={data.roadmapSteps} onStepClick={handleStepClick} />}
-                    </main>
-                    {/* The Footer component was missing in the previous version, re-adding it for completeness */}
-                    <Footer setPage={setPage} /> 
-                </StrictMode>
-            );
-        }
-
-        // Re-adding the full components for HomePage and Footer for clarity
+        // ** THE FIX **
+        // Only defining HomePage and Footer ONCE.
         function HomePage({ roadmapSteps, onStepClick }) {
              const scrollToRoadmap = () => {
                 document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
@@ -240,6 +159,65 @@
             );
         }
 
+        // --- Main App Component ---
+        function App() {
+            const [page, setPage] = useState('home');
+            const [data, setData] = useState(defaultTajweedData);
+            const [loading, setLoading] = useState(true);
+            const [activeLesson, setActiveLesson] = useState(null);
+
+            useEffect(() => {
+                async function fetchSummaryData() {
+                    if (db && collection) {
+                        try {
+                            const roadmapCol = collection(db, "roadmapSteps");
+                            const roadmapSnapshot = await getDocs(roadmapCol);
+                            const roadmapList = roadmapSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                            if (roadmapList.length > 0) {
+                                roadmapList.sort((a, b) => a.order - b.order);
+                                setData(prevData => ({ ...prevData, roadmapSteps: roadmapList }));
+                            }
+                        } catch (error) { console.error("Error fetching summaries:", error); }
+                    }
+                    setLoading(false);
+                }
+                fetchSummaryData();
+            }, []);
+
+            const handleStepClick = async (stepId) => {
+                if (!db || !doc) {
+                    return alert("Database not connected properly.");
+                }
+                const lessonId = stepId === 'step1' ? 'step1_foundation' : stepId;
+                const lessonRef = doc(db, "lessons", lessonId);
+                
+                try {
+                    const docSnap = await getDoc(lessonRef);
+                    if (docSnap.exists()) {
+                        setActiveLesson(docSnap.data());
+                    } else {
+                        console.log("No such lesson found in database with ID:", lessonId);
+                        alert("Lesson content not found in the database.");
+                    }
+                } catch (error) {
+                    console.error("Error fetching lesson:", error);
+                    alert("Could not load the lesson.");
+                }
+            };
+            
+            const handleCloseModal = () => setActiveLesson(null);
+
+            return (
+                <StrictMode>
+                    <LessonModal lesson={activeLesson} onClose={handleCloseModal} />
+                    <Header setPage={setPage} />
+                    <main>
+                        {page === 'home' && <HomePage roadmapSteps={data.roadmapSteps} onStepClick={handleStepClick} />}
+                    </main>
+                    <Footer setPage={setPage} /> 
+                </StrictMode>
+            );
+        }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
