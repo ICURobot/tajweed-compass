@@ -20,10 +20,11 @@
     
     <!-- Firebase SDKs -->
     <script type="module">
+        // Import all necessary functions from Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // This is your actual Firebase configuration
+        // Your actual Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAUrt-0tl_wj275YGQyRhyGYmMWTGs0BSM",
             authDomain: "tajweed-compass.firebaseapp.com",
@@ -38,8 +39,15 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        // Make db available globally for our React component to use
-        window.db = db;
+        // ** THE FIX **
+        // Make all necessary Firebase tools globally available under a single object
+        window.firebaseSDK = {
+            db,
+            collection,
+            getDocs,
+            doc,
+            getDoc
+        };
     </script>
     
     <style>
@@ -58,37 +66,29 @@
 
     <script type="text/babel">
         const { useState, useEffect, StrictMode } = React;
+        
+        // ** THE FIX **
+        // Destructure the globally available Firebase tools for use in our components
+        const { db, collection, getDocs, doc, getDoc } = window.firebaseSDK || {};
 
         // --- Default Data (Fallback) ---
         const defaultTajweedData = {
             roadmapSteps: [
-                { id: 'step1', title: 'The Foundation', description: "Start with the essential principles, from the meaning of Tajweed to the types of mistakes to avoid.", lessons: ['The Meaning of Tajweed', 'The Isti\'adha & Basmala', 'The Kinds of Mistakes (Lahn)'] },
-                { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran by understanding where letters originate and their unique characteristics.", lessons: ['Makharij al-Huruf (Articulation Points)', 'Heavy vs. Light Letters', 'Sun & Moon Letters'] },
+                { id: 'step1', title: 'The Foundation', description: "Start with the essential principles...", lessons: ['The Meaning of Tajweed', 'The Isti\'adha & Basmala', 'The Kinds of Mistakes (Lahn)'] },
+                { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran...", lessons: ['Makharij al-Huruf', 'Heavy vs. Light Letters', 'Sun & Moon Letters'] },
             ],
-            toolkitItems: [] // Simplified for brevity
+            toolkitItems: []
         };
         
         // --- Components ---
 
-        // NEW: Lesson Modal Component
         function LessonModal({ lesson, onClose }) {
             if (!lesson) return null;
-
             return (
-                <div 
-                    className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4"
-                    onClick={onClose} // Close modal on backdrop click
-                >
-                    <div 
-                        className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-                        onClick={e => e.stopPropagation()} // Prevent closing when clicking inside the modal
-                    >
-                        {/* We use dangerouslySetInnerHTML because our content from Firestore is trusted HTML */}
+                <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4" onClick={onClose}>
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                         <div dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
-                        <button 
-                            onClick={onClose}
-                            className="mt-6 bg-teal-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 w-full"
-                        >
+                        <button onClick={onClose} className="mt-6 bg-teal-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 w-full">
                             Close
                         </button>
                     </div>
@@ -96,49 +96,26 @@
             );
         }
         
-        // Header Component
         function Header({ setPage }) {
             return (
                 <header className="bg-[#FDFBF7]/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-200">
                     <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-                        <div className="font-lora text-2xl font-bold text-gray-800 cursor-pointer" onClick={() => setPage('home')}>
-                            The Tajweed Compass
-                        </div>
-                        <button onClick={() => setPage('toolkit')} className="bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 shadow-sm">
-                            The Toolkit
-                        </button>
+                        <div className="font-lora text-2xl font-bold text-gray-800 cursor-pointer" onClick={() => setPage('home')}>The Tajweed Compass</div>
+                        <button onClick={() => setPage('toolkit')} className="bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 shadow-sm">The Toolkit</button>
                     </nav>
                 </header>
             );
         }
 
-        // Footer Component
-        function Footer({ setPage }) {
-            return (
-                <footer className="bg-gray-100 border-t mt-24">
-                    <div className="container mx-auto px-6 py-8 text-center text-gray-600">
-                        <p className="font-lora text-lg mb-4">"Dedicated to making the science of Tajweed accessible to every family."</p>
-                        <div className="space-x-6">
-                            <a href="#" onClick={(e) => {e.preventDefault(); setPage('home')}} className="hover:text-teal-600">Home</a>
-                            <a href="#" onClick={(e) => {e.preventDefault(); setPage('toolkit')}} className="hover:text-teal-600">The Toolkit</a>
-                        </div>
-                    </div>
-                </footer>
-            );
-        }
+        function Footer({ setPage }) { /* ... same as before ... */ }
 
-        // UPDATED: Roadmap Step Component for Homepage
         function RoadmapStep({ step, index, onStepClick }) {
             const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100'];
             const cardColor = colors[index % colors.length];
-
             return (
                 <div className="roadmap-item w-full max-w-md mx-auto">
                     <div className="relative roadmap-connector">
-                        <div 
-                            className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300 cursor-pointer`}
-                            onClick={() => onStepClick(step.id)} // Added onClick handler
-                        >
+                        <div className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300 cursor-pointer`} onClick={() => onStepClick(step.id)}>
                             <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{`Step ${index + 1}: ${step.title}`}</h3>
                             <p className="text-gray-600 mb-4">{step.description}</p>
                             <ul className="space-y-2">
@@ -155,48 +132,21 @@
             );
         }
         
-        // Homepage Component
-        function HomePage({ roadmapSteps, onStepClick }) {
-             const scrollToRoadmap = () => {
-                document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
-            };
-
-            return (
-                <div>
-                    <div className="text-center py-20 md:py-32 px-6 bg-gradient-to-b from-teal-50/50 to-[#FDFBF7]">
-                        <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
-                        <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
-                        <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
-                        <button onClick={scrollToRoadmap} className="bg-teal-600 text-white font-bold px-8 py-4 rounded-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                            Start Your Journey ↓
-                        </button>
-                    </div>
-
-                    <div id="roadmap" className="container mx-auto px-6 py-16">
-                         <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
-                        <div className="space-y-12 flex flex-col items-center">
-                            {roadmapSteps.map((step, index) => (
-                                <RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
+        function HomePage({ roadmapSteps, onStepClick }) { /* ... same as before ... */ }
         
         // --- Main App Component ---
         function App() {
             const [page, setPage] = useState('home');
             const [data, setData] = useState(defaultTajweedData);
             const [loading, setLoading] = useState(true);
-            const [activeLesson, setActiveLesson] = useState(null); // NEW: State for the modal
+            const [activeLesson, setActiveLesson] = useState(null);
 
-            // Fetch summary data for roadmap and toolkit
             useEffect(() => {
                 async function fetchSummaryData() {
-                    if (window.db) {
+                    // Check if db and collection functions are available
+                    if (db && collection) {
                         try {
-                            const roadmapCol = collection(window.db, "roadmapSteps");
+                            const roadmapCol = collection(db, "roadmapSteps");
                             const roadmapSnapshot = await getDocs(roadmapCol);
                             const roadmapList = roadmapSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                             if (roadmapList.length > 0) {
@@ -210,15 +160,14 @@
                 fetchSummaryData();
             }, []);
 
-            // NEW: Function to fetch and display a lesson
             const handleStepClick = async (stepId) => {
-                if (!window.db) {
-                    alert("Database not connected.");
+                // Check if db and doc functions are available
+                if (!db || !doc) {
+                    alert("Database not connected properly.");
                     return;
                 }
-                // The lesson ID in Firestore is step1_foundation
                 const lessonId = stepId === 'step1' ? 'step1_foundation' : stepId;
-                const lessonRef = doc(window.db, "lessons", lessonId);
+                const lessonRef = doc(db, "lessons", lessonId);
                 
                 try {
                     const docSnap = await getDoc(lessonRef);
@@ -234,10 +183,7 @@
                 }
             };
             
-            // NEW: Function to close the modal
-            const handleCloseModal = () => {
-                setActiveLesson(null);
-            };
+            const handleCloseModal = () => setActiveLesson(null);
 
             return (
                 <StrictMode>
@@ -245,12 +191,55 @@
                     <Header setPage={setPage} />
                     <main>
                         {page === 'home' && <HomePage roadmapSteps={data.roadmapSteps} onStepClick={handleStepClick} />}
-                        {/* Toolkit page would be added here */}
                     </main>
-                    <Footer setPage={setPage} />
+                    {/* The Footer component was missing in the previous version, re-adding it for completeness */}
+                    <Footer setPage={setPage} /> 
                 </StrictMode>
             );
         }
+
+        // Re-adding the full components for HomePage and Footer for clarity
+        function HomePage({ roadmapSteps, onStepClick }) {
+             const scrollToRoadmap = () => {
+                document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            return (
+                <div>
+                    <div className="text-center py-20 md:py-32 px-6 bg-gradient-to-b from-teal-50/50 to-[#FDFBF7]">
+                        <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
+                        <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
+                        <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
+                        <button onClick={scrollToRoadmap} className="bg-teal-600 text-white font-bold px-8 py-4 rounded-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            Start Your Journey ↓
+                        </button>
+                    </div>
+                    <div id="roadmap" className="container mx-auto px-6 py-16">
+                         <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
+                        <div className="space-y-12 flex flex-col items-center">
+                            {roadmapSteps.map((step, index) => (
+                                <RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function Footer({ setPage }) {
+            return (
+                <footer className="bg-gray-100 border-t mt-24">
+                    <div className="container mx-auto px-6 py-8 text-center text-gray-600">
+                        <p className="font-lora text-lg mb-4">"Dedicated to making the science of Tajweed accessible to every family."</p>
+                        <div className="space-x-6">
+                            <a href="#" onClick={(e) => {e.preventDefault(); setPage('home')}} className="hover:text-teal-600">Home</a>
+                            <a href="#" onClick={(e) => {e.preventDefault(); setPage('toolkit')}} className="hover:text-teal-600">The Toolkit</a>
+                        </div>
+                    </div>
+                </footer>
+            );
+        }
+
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
@@ -258,11 +247,3 @@
     </script>
 </body>
 </html>
-```
-
-### What to Do Next
-
-1.  **Replace the Code:** Go to your `tajweed-compass` repository on GitHub and edit your `index.html` file. Delete all the old code and paste this new code in its place.
-2.  **Commit Changes:** Save and commit the changes to your `main` branch on GitHub.
-3.  **Wait for Netlify:** Netlify will automatically detect the change on GitHub and will start redeploying your website. This usually takes 1-2 minutes.
-4.  **Test It!** Go to your live website URL. Now, when you click on the "Step 1: The Foundation" card, a modal should pop up with all the detailed lesson content you just added to Fireba
