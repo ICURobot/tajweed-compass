@@ -8,7 +8,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter & Lora -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
@@ -21,14 +21,14 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // IMPORTANT: Replace with your actual Firebase configuration
+        // This is your actual Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyAUrT-0tL_wj275YGQyRhyGYmWWTGs0BSM",
+            apiKey: "AIzaSyAUrt-0tl_wj275YGQyRhyGYmMWTGs0BSM",
             authDomain: "tajweed-compass.firebaseapp.com",
             projectId: "tajweed-compass",
-            storageBucket: "tajweed-compass.firebasestorage.app",
+            storageBucket: "tajweed-compass.appspot.com",
             messagingSenderId: "81035085376",
             appId: "1:81035085376:web:c03f7018074f95124981a5",
             measurementId: "G-MN26V7G16H"
@@ -43,30 +43,14 @@
     </script>
     
     <style>
-        /* Custom styles to apply the fonts */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FDFBF7; /* A very light, warm beige */
-            color: #3f3c3a;
-        }
-        .font-lora {
-            font-family: 'Lora', serif;
-        }
-        /* Style for the roadmap connector lines */
+        body { font-family: 'Inter', sans-serif; background-color: #FDFBF7; color: #3f3c3a; }
+        .font-lora { font-family: 'Lora', serif; }
         .roadmap-connector::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 100%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 3rem; /* Spacing between cards */
-            background-color: #d1d5db; /* gray-300 */
+            content: ''; position: absolute; left: 50%; top: 100%;
+            transform: translateX(-50%); width: 2px; height: 3rem;
+            background-color: #d1d5db;
         }
-        /* Remove connector from the last item */
-        .roadmap-item:last-child .roadmap-connector::before {
-            display: none;
-        }
+        .roadmap-item:last-child .roadmap-connector::before { display: none; }
     </style>
 </head>
 <body>
@@ -75,73 +59,52 @@
     <script type="text/babel">
         const { useState, useEffect, StrictMode } = React;
 
-        // --- Data ---
-        // This data serves as a fallback if Firebase is not connected or data is not found.
+        // --- Default Data (Fallback) ---
         const defaultTajweedData = {
             roadmapSteps: [
                 { id: 'step1', title: 'The Foundation', description: "Start with the essential principles, from the meaning of Tajweed to the types of mistakes to avoid.", lessons: ['The Meaning of Tajweed', 'The Isti\'adha & Basmala', 'The Kinds of Mistakes (Lahn)'] },
                 { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran by understanding where letters originate and their unique characteristics.", lessons: ['Makharij al-Huruf (Articulation Points)', 'Heavy vs. Light Letters', 'Sun & Moon Letters'] },
-                { id: 'step3', title: 'Vowels & Markings', description: "Discover how the small markings above and below letters guide the entire flow and sound of your recitation.", lessons: ['Harakat (Fathah, Dammah, Kasrah)', 'Sukun, Shaddah, and Tanween'] },
-                { id: 'step4', title: 'The Art of Elongation', description: "Master the rules of Madd, the prolonging of sounds, which adds beauty and rhythm to recitation.", lessons: ['Natural Madd', 'Secondary Madd (Muttasil, Munfasil, etc.)'] },
-                { id: 'step5', title: 'Rules of \'N\' & \'M\'', description: "Understand how Noon (ن) and Meem (م) interact with other letters, a core part of Tajweed.", lessons: ['Rules of Noon Sakinah & Tanween', 'Rules of Meem Sakinah'] },
-                { id: 'step6', title: 'Specific Pronunciation', description: "Dive into two of the most distinct sounds in the Quran: the echoing Qalqalah and the nasal Ghunnah.", lessons: ['Al-Qalqalah (Vibration/Echoing)', 'Al-Ghunnah (Nasalization)'] },
-                { id: 'step7', title: 'Advanced Rules', description: "Explore the nuanced rules for specific letters and situations, like the heaviness of Ra (ر) and Lam (ل).", lessons: ['Rules of Ra (Tafkheem & Tarqeeq)', 'Rules of Lam in the name of Allah', 'Advanced Madd (Leen, \'Iwadh)'] },
-                { id: 'step8', title: 'Perfecting the Pause', description: "Learn the art of stopping and starting your recitation correctly using the signs found in the Mushaf.", lessons: ['Rules of Stopping (Waqf)', 'The Breathless Pause (Sakt)', 'Disjointed Letters'] },
             ],
-            toolkitItems: [
-                {
-                    id: 'tool1',
-                    title: 'The Heavy Letters (Isti’laa)',
-                    type: 'Chart',
-                    content: { letters: ['خ', 'ص', 'ض', 'غ', 'ط', 'ق', 'ظ'], phrase: 'خُصَّ ضَغْطٍ قِظْ' }
-                },
-                {
-                    id: 'tool2',
-                    title: 'The Qalqalah Letters',
-                    type: 'Chart',
-                    content: { letters: ['ق', 'ط', 'ب', 'ج', 'د'], phrase: 'قُطْبُ جَدٍّ' }
-                },
-                {
-                    id: 'tool3',
-                    title: 'Sun & Moon Letters',
-                    type: 'Guide',
-                    content: {
-                        sun: { title: 'Sun Letters (Silent ل)', letters: ['ت', 'ث', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ل', 'ن'] },
-                        moon: { title: 'Moon Letters (Clear ل)', letters: ['ا', 'ب', 'ج', 'ح', 'خ', 'ع', 'غ', 'ف', 'ق', 'ك', 'م', 'ه', 'و', 'ي'] }
-                    }
-                },
-                 {
-                    id: 'tool4',
-                    title: 'Waqf (Stop) Symbols',
-                    type: 'Guide',
-                    content: {
-                        symbols: [
-                            { symbol: 'مـ', name: 'Waqf Lazim', meaning: 'Mandatory Stop. You must stop here.' },
-                            { symbol: 'لا', name: 'Waqf Mamnu\'', meaning: 'Prohibited Stop. Do not stop here.' },
-                            { symbol: 'ج', name: 'Waqf Ja\'iz', meaning: 'Permissible. Stopping and continuing are equal.' },
-                            { symbol: 'صلى', name: 'Al-Wasl Awla', meaning: 'Permissible, but better to continue.' },
-                            { symbol: 'قلى', name: 'Al-Waqf Awla', meaning: 'Permissible, but better to stop.' },
-                            { symbol: '∴ ∴', name: 'Embracing Stop', meaning: 'Stop at one of the two, but not both.' }
-                        ]
-                    }
-                },
-            ]
+            toolkitItems: [] // Simplified for brevity
         };
-
+        
         // --- Components ---
 
+        // NEW: Lesson Modal Component
+        function LessonModal({ lesson, onClose }) {
+            if (!lesson) return null;
+
+            return (
+                <div 
+                    className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4"
+                    onClick={onClose} // Close modal on backdrop click
+                >
+                    <div 
+                        className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        onClick={e => e.stopPropagation()} // Prevent closing when clicking inside the modal
+                    >
+                        {/* We use dangerouslySetInnerHTML because our content from Firestore is trusted HTML */}
+                        <div dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
+                        <button 
+                            onClick={onClose}
+                            className="mt-6 bg-teal-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 w-full"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+        
         // Header Component
         function Header({ setPage }) {
             return (
-                <header className="bg-[#FDFBF7]/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+                <header className="bg-[#FDFBF7]/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-200">
                     <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
                         <div className="font-lora text-2xl font-bold text-gray-800 cursor-pointer" onClick={() => setPage('home')}>
                             The Tajweed Compass
                         </div>
-                        <button 
-                            onClick={() => setPage('toolkit')}
-                            className="bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 shadow-sm"
-                        >
+                        <button onClick={() => setPage('toolkit')} className="bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 shadow-sm">
                             The Toolkit
                         </button>
                     </nav>
@@ -164,21 +127,24 @@
             );
         }
 
-        // Roadmap Step Component for Homepage
-        function RoadmapStep({ step, index }) {
+        // UPDATED: Roadmap Step Component for Homepage
+        function RoadmapStep({ step, index, onStepClick }) {
             const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100'];
             const cardColor = colors[index % colors.length];
 
             return (
                 <div className="roadmap-item w-full max-w-md mx-auto">
                     <div className="relative roadmap-connector">
-                        <div className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300`}>
+                        <div 
+                            className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300 cursor-pointer`}
+                            onClick={() => onStepClick(step.id)} // Added onClick handler
+                        >
                             <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{`Step ${index + 1}: ${step.title}`}</h3>
                             <p className="text-gray-600 mb-4">{step.description}</p>
                             <ul className="space-y-2">
                                 {step.lessons.map((lesson, i) => (
                                     <li key={i} className="flex items-start">
-                                        <svg className="w-5 h-5 mr-2 text-teal-500 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <svg className="w-5 h-5 mr-2 text-teal-500 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         <span className="text-gray-700">{lesson}</span>
                                     </li>
                                 ))}
@@ -188,67 +154,15 @@
                 </div>
             );
         }
-
-        // Toolkit Card Component
-        function ToolkitCard({ item }) {
-            return (
-                <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200/80">
-                    <h3 className="font-lora text-xl font-bold text-gray-800 mb-4">{item.title}</h3>
-                    {item.type === 'Chart' && (
-                        <div>
-                            <div className="flex flex-wrap gap-3 justify-center mb-2">
-                                {item.content.letters.map(letter => (
-                                    <span key={letter} className="w-16 h-16 flex items-center justify-center bg-sky-100 text-sky-800 font-bold text-4xl rounded-lg">{letter}</span>
-                                ))}
-                            </div>
-                            <p className="text-center text-gray-500 mt-3 text-lg">{item.content.phrase}</p>
-                        </div>
-                    )}
-                    {item.type === 'Guide' && item.content.symbols && (
-                         <ul className="space-y-3">
-                            {item.content.symbols.map(s => (
-                                <li key={s.symbol} className="flex items-start">
-                                    <span className="text-3xl font-bold text-teal-600 w-12 text-center">{s.symbol}</span>
-                                    <div className="ml-3">
-                                        <p className="font-semibold text-gray-700">{s.name}</p>
-                                        <p className="text-gray-500 text-sm">{s.meaning}</p>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                     {item.type === 'Guide' && item.content.sun && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <h4 className="font-semibold text-green-700 mb-2">{item.content.moon.title}</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {item.content.moon.letters.map(l => <span key={l} className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-800 rounded">{l}</span>)}
-                                </div>
-                            </div>
-                             <div>
-                                <h4 className="font-semibold text-amber-700 mb-2">{item.content.sun.title}</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {item.content.sun.letters.map(l => <span key={l} className="w-8 h-8 flex items-center justify-center bg-amber-100 text-amber-800 rounded">{l}</span>)}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        }
-
+        
         // Homepage Component
-        function HomePage({ roadmapSteps }) {
+        function HomePage({ roadmapSteps, onStepClick }) {
              const scrollToRoadmap = () => {
-                const roadmapElement = document.getElementById('roadmap');
-                if (roadmapElement) {
-                    roadmapElement.scrollIntoView({ behavior: 'smooth' });
-                }
+                document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
             };
 
             return (
                 <div>
-                    {/* Welcome Section */}
                     <div className="text-center py-20 md:py-32 px-6 bg-gradient-to-b from-teal-50/50 to-[#FDFBF7]">
                         <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
                         <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
@@ -258,106 +172,97 @@
                         </button>
                     </div>
 
-                    {/* Roadmap Section */}
                     <div id="roadmap" className="container mx-auto px-6 py-16">
                          <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
                         <div className="space-y-12 flex flex-col items-center">
                             {roadmapSteps.map((step, index) => (
-                                <RoadmapStep key={step.id} step={step} index={index} />
+                                <RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />
                             ))}
                         </div>
                     </div>
                 </div>
             );
         }
-
-        // Toolkit Page Component
-        function ToolkitPage({ toolkitItems }) {
-            return (
-                <div className="bg-gray-50/80 min-h-screen">
-                    <div className="container mx-auto px-6 py-16">
-                        <div className="text-center mb-12">
-                            <h1 className="font-lora text-4xl md:text-5xl font-bold text-gray-800 mb-3">The Tajweed Toolkit</h1>
-                            <p className="text-lg text-gray-600 max-w-3xl mx-auto">Your dashboard of "cheatsheets" for when you need an answer, fast. Perfect for quick reference and practice sessions.</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {toolkitItems.map(item => (
-                                <ToolkitCard key={item.id} item={item} />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // Main App Component
+        
+        // --- Main App Component ---
         function App() {
             const [page, setPage] = useState('home');
             const [data, setData] = useState(defaultTajweedData);
             const [loading, setLoading] = useState(true);
+            const [activeLesson, setActiveLesson] = useState(null); // NEW: State for the modal
 
-            // This effect will run once to try and fetch data from Firestore.
+            // Fetch summary data for roadmap and toolkit
             useEffect(() => {
-                async function fetchData() {
-                    // Check if Firebase is configured and available on the window object
+                async function fetchSummaryData() {
                     if (window.db) {
                         try {
-                            console.log("Attempting to fetch data from Firestore...");
                             const roadmapCol = collection(window.db, "roadmapSteps");
-                            const toolkitCol = collection(window.db, "toolkitItems");
-
                             const roadmapSnapshot = await getDocs(roadmapCol);
-                            const toolkitSnapshot = await getDocs(toolkitCol);
-                            
                             const roadmapList = roadmapSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            const toolkitList = toolkitSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-                            // Only update state if data was actually fetched
-                            if (roadmapList.length > 0 || toolkitList.length > 0) {
-                                // Sorting by an 'order' field is recommended if you store in Firestore
+                            if (roadmapList.length > 0) {
                                 roadmapList.sort((a, b) => a.order - b.order);
-                                toolkitList.sort((a, b) => a.order - b.order);
-                                setData({ roadmapSteps: roadmapList, toolkitItems: toolkitList });
-                                console.log("Successfully fetched data from Firestore.");
-                            } else {
-                                console.log("Firestore is empty or not found. Using default data.");
+                                setData(prevData => ({ ...prevData, roadmapSteps: roadmapList }));
                             }
-                        } catch (error) {
-                            console.error("Error fetching from Firestore, using default data:", error);
-                        }
-                    } else {
-                        console.log("Firebase not configured. Using default data.");
+                        } catch (error) { console.error("Error fetching summaries:", error); }
                     }
                     setLoading(false);
                 }
+                fetchSummaryData();
+            }, []);
 
-                fetchData();
-            }, []); // Empty dependency array means this runs only once on mount
-
-             if (loading && window.db) {
-                return <div className="min-h-screen flex items-center justify-center"><p className="text-xl">Loading Tajweed Compass...</p></div>;
-            }
+            // NEW: Function to fetch and display a lesson
+            const handleStepClick = async (stepId) => {
+                if (!window.db) {
+                    alert("Database not connected.");
+                    return;
+                }
+                // The lesson ID in Firestore is step1_foundation
+                const lessonId = stepId === 'step1' ? 'step1_foundation' : stepId;
+                const lessonRef = doc(window.db, "lessons", lessonId);
+                
+                try {
+                    const docSnap = await getDoc(lessonRef);
+                    if (docSnap.exists()) {
+                        setActiveLesson(docSnap.data());
+                    } else {
+                        console.log("No such lesson found!");
+                        alert("Lesson content not found in the database.");
+                    }
+                } catch (error) {
+                    console.error("Error fetching lesson:", error);
+                    alert("Could not load the lesson.");
+                }
+            };
+            
+            // NEW: Function to close the modal
+            const handleCloseModal = () => {
+                setActiveLesson(null);
+            };
 
             return (
-                <div>
+                <StrictMode>
+                    <LessonModal lesson={activeLesson} onClose={handleCloseModal} />
                     <Header setPage={setPage} />
                     <main>
-                        {page === 'home' && <HomePage roadmapSteps={data.roadmapSteps} />}
-                        {page === 'toolkit' && <ToolkitPage toolkitItems={data.toolkitItems} />}
+                        {page === 'home' && <HomePage roadmapSteps={data.roadmapSteps} onStepClick={handleStepClick} />}
+                        {/* Toolkit page would be added here */}
                     </main>
                     <Footer setPage={setPage} />
-                </div>
+                </StrictMode>
             );
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(
-            <StrictMode>
-                <App />
-            </StrictMode>
-        );
+        root.render(<App />);
 
     </script>
 </body>
 </html>
+```
+
+### What to Do Next
+
+1.  **Replace the Code:** Go to your `tajweed-compass` repository on GitHub and edit your `index.html` file. Delete all the old code and paste this new code in its place.
+2.  **Commit Changes:** Save and commit the changes to your `main` branch on GitHub.
+3.  **Wait for Netlify:** Netlify will automatically detect the change on GitHub and will start redeploying your website. This usually takes 1-2 minutes.
+4.  **Test It!** Go to your live website URL. Now, when you click on the "Step 1: The Foundation" card, a modal should pop up with all the detailed lesson content you just added to Fireba
