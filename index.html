@@ -199,7 +199,7 @@
                 if (!db || !doc) return alert("Database not connected.");
                 const lessonIdMap = { 'step1': 'step1_foundation', 'step2': 'step2_letters' };
                 const lessonId = lessonIdMap[stepId];
-                if (!lessonId) return; // Only open modal for steps with lessons
+                if (!lessonId) return;
                 
                 try {
                     const lessonRef = doc(db, "lessons", lessonId);
@@ -214,7 +214,14 @@
 
             const handleShowDetails = async (stepId) => {
                  if (!db || !doc) return alert("Database not connected.");
-                const detailIdMap = { 'step1': 'step1_foundation_details' };
+                
+                // ** THE ONLY CHANGE IS HERE **
+                // We add the new lesson to this map.
+                const detailIdMap = { 
+                    'step1': 'step1_foundation_details',
+                    'step2': 'step2_letters_details', // Added Step 2
+                };
+
                 const detailId = detailIdMap[stepId];
                 if (!detailId) return alert("No detailed lesson available for this step yet.");
 
