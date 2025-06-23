@@ -116,8 +116,6 @@
             );
         }
         
-        // ** THE FIX **
-        // Only defining HomePage and Footer ONCE.
         function HomePage({ roadmapSteps, onStepClick }) {
              const scrollToRoadmap = () => {
                 document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
@@ -188,7 +186,17 @@
                 if (!db || !doc) {
                     return alert("Database not connected properly.");
                 }
-                const lessonId = stepId === 'step1' ? 'step1_foundation' : stepId;
+                
+                // ** THE CHANGE IS HERE **
+                // This map makes it easy to add new lessons in the future.
+                const lessonIdMap = {
+                    'step1': 'step1_foundation',
+                    'step2': 'step2_letters',
+                    // We can add 'step3', 'step4', etc. here later
+                };
+
+                const lessonId = lessonIdMap[stepId] || stepId;
+                
                 const lessonRef = doc(db, "lessons", lessonId);
                 
                 try {
