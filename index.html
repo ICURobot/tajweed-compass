@@ -50,17 +50,19 @@
 
         const defaultTajweedData = {
             roadmapSteps: [
-                { id: 'step1', title: 'The Foundation', description: "Start with the essential principles...", lessons: ['The Meaning of Tajweed', 'The Isti\'adha & Basmala', 'The Kinds of Mistakes (Lahn)'] },
-                { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran...", lessons: ['Makharij al-Huruf', 'Heavy vs. Light Letters', 'Sun & Moon Letters'] },
-                { id: 'step3', title: 'Vowels & Markings', description: "Discover how small markings guide recitation.", lessons: ['Harakat', 'Sukun, Shaddah, and Tanween'] },
+                // Populated from Firebase, this is just a fallback
+                { id: 'step1', title: 'The Foundation', description: "Start with the essential principles...", lessons: ['Meaning of Tajweed', 'Istia\'dha & Basmala', 'Kinds of Mistakes'] },
+                { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran...", lessons: ['Makharij al-Huruf', 'Letter Properties'] },
+                { id: 'step3', title: 'Vowels & Markings', description: "Discover how markings guide recitation.", lessons: ['Harakat', 'Sukun, Shaddah, Tanween'] },
                 { id: 'step4', title: 'The Art of Elongation (Madd)', description: "Master the rules of prolonging sounds.", lessons: ['Natural Madd', 'Secondary Madd'] },
-                { id: 'step5', title: 'The Rules of \'N\' and \'M\'', description: "Learn how Noon (ن) and Meem (م) interact with other letters.", lessons: ['Rules of Noon Sakinah', 'Rules of Meem Sakinah'] },
+                { id: 'step5', title: 'The Rules of \'N\' and \'M\'', description: "Learn how Noon (ن) and Meem (م) interact.", lessons: ['Noon Sakinah Rules', 'Meem Sakinah Rules'] },
+                { id: 'step6', title: 'Special Letter Rules', description: "Dive into the distinct sounds of Qalqalah (echo) and Ghunnah (nasal hum).", lessons: ['Al-Qalqalah', 'Al-Ghunnah'] },
             ],
             toolkitItems: []
         };
         
         // --- Components (LessonModal, DetailPage, Header, RoadmapStep, HomePage, Footer) ---
-        // These components remain unchanged. They are included here for completeness.
+        // Components remain unchanged. Included here for completeness.
 
         function LessonModal({ lesson, onClose, onShowDetails }) {
             if (!lesson) return null;
@@ -115,7 +117,7 @@
         }
 
         function RoadmapStep({ step, index, onStepClick }) {
-            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100'];
+            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100'];
             const cardColor = colors[index % colors.length];
             return (
                 <div className="roadmap-item w-full max-w-md mx-auto">
@@ -206,7 +208,8 @@
                     'step2': 'step2_letters',
                     'step3': 'step3_vowels',
                     'step4': 'step4_madd',
-                    'step5': 'step5_nm_rules', // Added Step 5
+                    'step5': 'step5_nm_rules',
+                    'step6': 'step6_special_rules', // Added Step 6
                 };
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
@@ -230,7 +233,8 @@
                     'step2': 'step2_letters_details',
                     'step3': 'step3_vowels_details',
                     'step4': 'step4_madd_details',
-                    'step5': 'step5_nm_rules_details', // Added Step 5
+                    'step5': 'step5_nm_rules_details',
+                    'step6': 'step6_special_rules_details', // Added Step 6
                 };
 
                 const detailId = detailIdMap[stepId];
