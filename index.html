@@ -52,14 +52,15 @@
             roadmapSteps: [
                 { id: 'step1', title: 'The Foundation', description: "Start with the essential principles...", lessons: ['The Meaning of Tajweed', 'The Isti\'adha & Basmala', 'The Kinds of Mistakes (Lahn)'] },
                 { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran...", lessons: ['Makharij al-Huruf', 'Heavy vs. Light Letters', 'Sun & Moon Letters'] },
-                { id: 'step3', title: 'Vowels & Markings', description: "Discover how small markings guide the entire flow and sound of your recitation.", lessons: ['Harakat (Fathah, Dammah, Kasrah)', 'Sukun, Shaddah, and Tanween'] },
-                { id: 'step4', title: 'The Art of Elongation (Madd)', description: "Master the rules of prolonging sounds, which adds beauty and rhythm to recitation.", lessons: ['Natural Madd (2 counts)', 'Secondary Madd (4-6 counts)'] },
+                { id: 'step3', title: 'Vowels & Markings', description: "Discover how small markings guide recitation.", lessons: ['Harakat', 'Sukun, Shaddah, and Tanween'] },
+                { id: 'step4', title: 'The Art of Elongation (Madd)', description: "Master the rules of prolonging sounds.", lessons: ['Natural Madd', 'Secondary Madd'] },
+                { id: 'step5', title: 'The Rules of \'N\' and \'M\'', description: "Learn how Noon (ن) and Meem (م) interact with other letters.", lessons: ['Rules of Noon Sakinah', 'Rules of Meem Sakinah'] },
             ],
             toolkitItems: []
         };
         
         // --- Components (LessonModal, DetailPage, Header, RoadmapStep, HomePage, Footer) ---
-        // These components remain unchanged from the previous version. They are included here for completeness.
+        // These components remain unchanged. They are included here for completeness.
 
         function LessonModal({ lesson, onClose, onShowDetails }) {
             if (!lesson) return null;
@@ -114,7 +115,7 @@
         }
 
         function RoadmapStep({ step, index, onStepClick }) {
-            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100'];
+            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100'];
             const cardColor = colors[index % colors.length];
             return (
                 <div className="roadmap-item w-full max-w-md mx-auto">
@@ -204,7 +205,8 @@
                     'step1': 'step1_foundation', 
                     'step2': 'step2_letters',
                     'step3': 'step3_vowels',
-                    'step4': 'step4_madd', // Added Step 4
+                    'step4': 'step4_madd',
+                    'step5': 'step5_nm_rules', // Added Step 5
                 };
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
@@ -227,7 +229,8 @@
                     'step1': 'step1_foundation_details',
                     'step2': 'step2_letters_details',
                     'step3': 'step3_vowels_details',
-                    'step4': 'step4_madd_details', // Added Step 4
+                    'step4': 'step4_madd_details',
+                    'step5': 'step5_nm_rules_details', // Added Step 5
                 };
 
                 const detailId = detailIdMap[stepId];
