@@ -53,11 +53,13 @@
                 { id: 'step1', title: 'The Foundation', description: "Start with the essential principles...", lessons: ['The Meaning of Tajweed', 'The Isti\'adha & Basmala', 'The Kinds of Mistakes (Lahn)'] },
                 { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran...", lessons: ['Makharij al-Huruf', 'Heavy vs. Light Letters', 'Sun & Moon Letters'] },
                 { id: 'step3', title: 'Vowels & Markings', description: "Discover how small markings guide the entire flow and sound of your recitation.", lessons: ['Harakat (Fathah, Dammah, Kasrah)', 'Sukun, Shaddah, and Tanween'] },
+                { id: 'step4', title: 'The Art of Elongation (Madd)', description: "Master the rules of prolonging sounds, which adds beauty and rhythm to recitation.", lessons: ['Natural Madd (2 counts)', 'Secondary Madd (4-6 counts)'] },
             ],
             toolkitItems: []
         };
         
-        // --- Components ---
+        // --- Components (LessonModal, DetailPage, Header, RoadmapStep, HomePage, Footer) ---
+        // These components remain unchanged from the previous version. They are included here for completeness.
 
         function LessonModal({ lesson, onClose, onShowDetails }) {
             if (!lesson) return null;
@@ -201,7 +203,8 @@
                 const lessonIdMap = { 
                     'step1': 'step1_foundation', 
                     'step2': 'step2_letters',
-                    'step3': 'step3_vowels', // Added Step 3
+                    'step3': 'step3_vowels',
+                    'step4': 'step4_madd', // Added Step 4
                 };
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
@@ -223,7 +226,8 @@
                 const detailIdMap = { 
                     'step1': 'step1_foundation_details',
                     'step2': 'step2_letters_details',
-                    'step3': 'step3_vowels_details', // Added Step 3
+                    'step3': 'step3_vowels_details',
+                    'step4': 'step4_madd_details', // Added Step 4
                 };
 
                 const detailId = detailIdMap[stepId];
