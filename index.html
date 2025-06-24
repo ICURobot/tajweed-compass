@@ -50,19 +50,20 @@
 
         const defaultTajweedData = {
             roadmapSteps: [
-                // Populated from Firebase, this is just a fallback
+                // Fallback data, will be replaced by Firebase
                 { id: 'step1', title: 'The Foundation', description: "Start with the essential principles...", lessons: ['Meaning of Tajweed', 'Istia\'dha & Basmala', 'Kinds of Mistakes'] },
                 { id: 'step2', title: 'Meet the Letters', description: "Learn the building blocks of the Quran...", lessons: ['Makharij al-Huruf', 'Letter Properties'] },
                 { id: 'step3', title: 'Vowels & Markings', description: "Discover how markings guide recitation.", lessons: ['Harakat', 'Sukun, Shaddah, Tanween'] },
                 { id: 'step4', title: 'The Art of Elongation (Madd)', description: "Master the rules of prolonging sounds.", lessons: ['Natural Madd', 'Secondary Madd'] },
                 { id: 'step5', title: 'The Rules of \'N\' and \'M\'', description: "Learn how Noon (ن) and Meem (م) interact.", lessons: ['Noon Sakinah Rules', 'Meem Sakinah Rules'] },
                 { id: 'step6', title: 'Special Letter Rules', description: "Dive into the distinct sounds of Qalqalah (echo) and Ghunnah (nasal hum).", lessons: ['Al-Qalqalah', 'Al-Ghunnah'] },
+                { id: 'step7', title: 'Advanced & Special Rules', description: "Learn the nuanced rules for specific letters and unique cases.", lessons: ['Rules of Ra', 'Rules of Lam', 'Special Cases'] },
             ],
             toolkitItems: []
         };
         
         // --- Components (LessonModal, DetailPage, Header, RoadmapStep, HomePage, Footer) ---
-        // Components remain unchanged. Included here for completeness.
+        // Components remain unchanged.
 
         function LessonModal({ lesson, onClose, onShowDetails }) {
             if (!lesson) return null;
@@ -117,7 +118,7 @@
         }
 
         function RoadmapStep({ step, index, onStepClick }) {
-            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100'];
+            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100'];
             const cardColor = colors[index % colors.length];
             return (
                 <div className="roadmap-item w-full max-w-md mx-auto">
@@ -209,7 +210,8 @@
                     'step3': 'step3_vowels',
                     'step4': 'step4_madd',
                     'step5': 'step5_nm_rules',
-                    'step6': 'step6_special_rules', // Added Step 6
+                    'step6': 'step6_special_rules',
+                    'step7': 'step7_advanced_rules', // Added Step 7
                 };
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
@@ -234,7 +236,8 @@
                     'step3': 'step3_vowels_details',
                     'step4': 'step4_madd_details',
                     'step5': 'step5_nm_rules_details',
-                    'step6': 'step6_special_rules_details', // Added Step 6
+                    'step6': 'step6_special_rules_details',
+                    'step7': 'step7_advanced_rules_details', // Added Step 7
                 };
 
                 const detailId = detailIdMap[stepId];
