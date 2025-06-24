@@ -15,7 +15,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // Import Analytics functions
         import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         
         const firebaseConfig = {
@@ -30,7 +29,6 @@
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        // Initialize Analytics and make it available
         const analytics = getAnalytics(app);
         
         window.firebaseSDK = { db, collection, getDocs, doc, getDoc, analytics, logEvent };
@@ -57,17 +55,125 @@
             toolkitItems: []
         };
         
-        // --- Components ---
-        // Components (LessonModal, DetailPage, ToolkitPage, etc.) do not need to change.
-        // The logic is handled in the main App component.
-        function LessonModal({ lesson, onClose, onShowDetails }) { /* ... same as before ... */ }
-        function DetailPage({ lesson, onBack }) { /* ... same as before ... */ }
-        function ToolkitPage({ toolkitItems }) { /* ... same as before ... */ }
-        function ToolkitCard({ item }) { /* ... same as before ... */ }
-        function Header({ setPage, onBack, showBackButton }) { /* ... same as before ... */ }
-        function RoadmapStep({ step, index, onStepClick }) { /* ... same as before ... */ }
-        function HomePage({ roadmapSteps, onStepClick }) { /* ... same as before ... */ }
-        function Footer({ setPage, onHomeClick }) { /* ... same as before ... */ }
+        // --- Components (Defined Once) ---
+
+        function LessonModal({ lesson, onClose, onShowDetails }) {
+            if (!lesson) return null;
+            return (
+                <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4" onClick={onClose}>
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
+                        <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                            <button onClick={() => onShowDetails(lesson.lessonId)} className="w-full bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300">Read Full Lesson</button>
+                            <button onClick={onClose} className="w-full bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-300">Close</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function DetailPage({ lesson, onBack }) {
+            return (
+                <div className="bg-white min-h-screen">
+                    <div className="container mx-auto px-6 py-12">
+                        <button onClick={onBack} className="inline-flex items-center gap-2 mb-8 text-teal-600 font-semibold hover:text-teal-800 transition-colors">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                           Back to Roadmap
+                        </button>
+                        {lesson ? <div className="prose max-w-none lg:prose-lg" dangerouslySetInnerHTML={{ __html: lesson.content }}></div> : <p>Loading lesson...</p>}
+                    </div>
+                </div>
+            );
+        }
+
+        function ToolkitPage({ toolkitItems }) {
+            return (
+                <div className="bg-gray-50/80 min-h-screen">
+                    <div className="container mx-auto px-6 py-16">
+                        <div className="text-center mb-12">
+                            <h1 className="font-lora text-4xl md:text-5xl font-bold text-gray-800 mb-3">The Tajweed Toolkit</h1>
+                            <p className="text-lg text-gray-600 max-w-3xl mx-auto">Your dashboard of "cheatsheets" for when you need an answer fast. Perfect for quick reference during practice.</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {toolkitItems.map(item => <ToolkitCard key={item.id} item={item} />)}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function ToolkitCard({ item }) {
+            const parsedContent = (content) => { try { return JSON.parse(content); } catch (e) { return null; } };
+            return (
+                <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200/80 h-full flex flex-col">
+                    <h3 className="font-lora text-xl font-bold text-gray-800 mb-4">{item.title}</h3>
+                    <div className="flex-grow">
+                        {item.type === 'letterChart' && (<div className="text-center"><div className="flex flex-wrap gap-3 justify-center mb-2">{item.content.split(',').map(letter => (<span key={letter} className="w-16 h-16 flex items-center justify-center bg-sky-100 text-sky-800 font-bold text-4xl rounded-lg font-lora">{letter}</span>))}</div>{item.helperText && <p className="text-center text-gray-500 mt-3 text-lg font-lora" dir="rtl">{item.helperText}</p>}</div>)}
+                        {item.type === 'ruleGuide' && Array.isArray(parsedContent(item.content)) && (<ul className="space-y-3">{parsedContent(item.content).map(ruleItem => (<li key={ruleItem.rule} className="flex items-start"><div className="ml-3"><p className="font-semibold text-gray-700">{ruleItem.rule}</p><p className="text-gray-500 text-sm font-lora" dir="rtl">{ruleItem.letters}</p></div></li>))}</ul>)}
+                        {item.type === 'dualChart' && parsedContent(item.content) && (<div className="grid grid-cols-1 gap-4"><div><h4 className="font-semibold text-green-700 mb-2">{parsedContent(item.content).moon.title}</h4><div className="flex flex-wrap gap-2">{parsedContent(item.content).moon.letters.split(',').map(l => <span key={l} className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-800 rounded font-bold">{l}</span>)}</div></div><div><h4 className="font-semibold text-amber-700 mb-2 mt-4">{parsedContent(item.content).sun.title}</h4><div className="flex flex-wrap gap-2">{parsedContent(item.content).sun.letters.split(',').map(l => <span key={l} className="w-8 h-8 flex items-center justify-center bg-amber-100 text-amber-800 rounded font-bold">{l}</span>)}</div></div></div>)}
+                    </div>
+                </div>
+            );
+        }
+
+        function Header({ setPage, onBack, showBackButton }) {
+            return (
+                <header className="bg-[#FDFBF7]/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-200">
+                    <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+                         {showBackButton ? (<button onClick={onBack} className="font-lora text-2xl font-bold text-gray-800 cursor-pointer">&larr; The Tajweed Compass</button>) : (<div className="font-lora text-2xl font-bold text-gray-800 cursor-pointer" onClick={() => setPage('home')}>The Tajweed Compass</div>)}
+                        <button onClick={() => setPage('toolkit')} className="bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 shadow-sm">The Toolkit</button>
+                    </nav>
+                </header>
+            );
+        }
+
+        function RoadmapStep({ step, index, onStepClick }) {
+            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100', 'bg-cyan-100'];
+            const cardColor = colors[index % colors.length];
+            return (
+                <div className="roadmap-item w-full max-w-md mx-auto">
+                    <div className="relative roadmap-connector">
+                        <div className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300 cursor-pointer`} onClick={() => onStepClick(step.id)}>
+                            <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{`Step ${index + 1}: ${step.title}`}</h3>
+                            <p className="text-gray-600 mb-4">{step.description}</p>
+                            <ul className="space-y-2">{step.lessons.map((lesson, i) => (<li key={i} className="flex items-start"><svg className="w-5 h-5 mr-2 text-teal-500 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span className="text-gray-700">{lesson}</span></li>))}</ul>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function HomePage({ roadmapSteps, onStepClick }) {
+             const scrollToRoadmap = () => document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
+            return (
+                <div>
+                    <div className="text-center py-20 md:py-32 px-6 bg-gradient-to-b from-teal-50/50 to-[#FDFBF7]">
+                        <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
+                        <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
+                        <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
+                        <button onClick={scrollToRoadmap} className="bg-teal-600 text-white font-bold px-8 py-4 rounded-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg">Start Your Journey ↓</button>
+                    </div>
+                    <div id="roadmap" className="container mx-auto px-6 py-16">
+                         <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
+                        <div className="space-y-12 flex flex-col items-center">{roadmapSteps.map((step, index) => (<RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />))}</div>
+                    </div>
+                </div>
+            );
+        }
+
+        function Footer({ setPage, onHomeClick }) {
+            return (
+                <footer className="bg-gray-100 border-t mt-24">
+                    <div className="container mx-auto px-6 py-8 text-center text-gray-600">
+                        <p className="font-lora text-lg mb-4">"Dedicated to making the science of Tajweed accessible to every family."</p>
+                        <div className="space-x-6">
+                            <a href="#" onClick={(e) => { e.preventDefault(); onHomeClick(); }} className="hover:text-teal-600">Home</a>
+                            <a href="#" onClick={(e) => { e.preventDefault(); setPage('toolkit'); }} className="hover:text-teal-600">The Toolkit</a>
+                        </div>
+                    </div>
+                </footer>
+            );
+        }
 
         // --- Main App Component ---
         function App() {
@@ -89,7 +195,10 @@
                             const toolkitList = toolkitSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                             if (roadmapList.length > 0) roadmapList.sort((a, b) => a.order - b.order);
                             if (toolkitList.length > 0) toolkitList.sort((a, b) => a.order - b.order);
-                            setData({ roadmapSteps: roadmapList.length > 0 ? roadmapList : [], toolkitItems: toolkitList.length > 0 ? toolkitList : [] });
+                            setData({ 
+                                roadmapSteps: roadmapList.length > 0 ? roadmapList : [], 
+                                toolkitItems: toolkitList.length > 0 ? toolkitList : [] 
+                            });
                         } catch (error) { console.error("Error fetching data:", error); }
                     }
                     setLoading(false);
@@ -97,7 +206,6 @@
                 fetchAllData();
             }, []);
             
-            // --- ANALYTICS TAGGING ADDED HERE ---
             const handleStepClick = async (stepId) => {
                 if (!db || !doc) return alert("Database not connected.");
                 const lessonIdMap = { 
@@ -107,13 +215,11 @@
                 };
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
-                
                 try {
                     const lessonRef = doc(db, "lessons", lessonId);
                     const docSnap = await getDoc(lessonRef);
                     if (docSnap.exists()) {
                         setActiveLessonModal({ ...docSnap.data(), lessonId: stepId });
-                        // Log event for viewing a lesson summary
                         if(analytics && logEvent) logEvent(analytics, 'select_content', { content_type: 'lesson_summary', item_id: stepId });
                     } else { alert("Lesson summary not found."); }
                 } catch (error) { alert("Could not load lesson summary."); }
@@ -128,7 +234,6 @@
                 };
                 const detailId = detailIdMap[stepId];
                 if (!detailId) return alert("No detailed lesson available for this step yet.");
-
                 try {
                     const lessonRef = doc(db, "detailedLessons", detailId);
                     const docSnap = await getDoc(lessonRef);
@@ -136,7 +241,6 @@
                         setActiveDetailPage(docSnap.data());
                         setActiveLessonModal(null);
                         setPage('detail');
-                        // Log event for viewing a detailed lesson
                         if(analytics && logEvent) logEvent(analytics, 'view_item', { item_id: stepId, item_name: docSnap.data().title });
                     } else { alert("Detailed lesson not found."); }
                 } catch (error) { alert("Could not load the detailed lesson."); }
@@ -145,7 +249,6 @@
             const handleSetPage = (pageName) => {
                 setPage(pageName);
                 if (pageName === 'toolkit') {
-                    // Log event for viewing the toolkit
                     if(analytics && logEvent) logEvent(analytics, 'view_item_list', { item_list_id: 'toolkit', item_list_name: 'The Toolkit' });
                 }
             }
@@ -172,123 +275,8 @@
             );
         }
 
-        // All other component definitions are here for completeness...
-        function LessonModal({ lesson, onClose, onShowDetails }) {
-            if (!lesson) return null;
-            return (
-                <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4" onClick={onClose}>
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
-                        <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                            <button onClick={() => onShowDetails(lesson.lessonId)} className="w-full bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300">Read Full Lesson</button>
-                            <button onClick={onClose} className="w-full bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-300">Close</button>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        function DetailPage({ lesson, onBack }) {
-            return (
-                <div className="bg-white min-h-screen">
-                    <div className="container mx-auto px-6 py-12">
-                        <button onClick={onBack} className="inline-flex items-center gap-2 mb-8 text-teal-600 font-semibold hover:text-teal-800 transition-colors">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                           Back to Roadmap
-                        </button>
-                        {lesson ? <div className="prose max-w-none lg:prose-lg" dangerouslySetInnerHTML={{ __html: lesson.content }}></div> : <p>Loading lesson...</p>}
-                    </div>
-                </div>
-            );
-        }
-        function ToolkitPage({ toolkitItems }) {
-            return (
-                <div className="bg-gray-50/80 min-h-screen">
-                    <div className="container mx-auto px-6 py-16">
-                        <div className="text-center mb-12">
-                            <h1 className="font-lora text-4xl md:text-5xl font-bold text-gray-800 mb-3">The Tajweed Toolkit</h1>
-                            <p className="text-lg text-gray-600 max-w-3xl mx-auto">Your dashboard of "cheatsheets" for when you need an answer fast. Perfect for quick reference during practice.</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {toolkitItems.map(item => <ToolkitCard key={item.id} item={item} />)}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        function ToolkitCard({ item }) {
-            const parsedContent = (content) => { try { return JSON.parse(content); } catch (e) { return null; } };
-            return (
-                <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200/80 h-full flex flex-col">
-                    <h3 className="font-lora text-xl font-bold text-gray-800 mb-4">{item.title}</h3>
-                    <div className="flex-grow">
-                        {item.type === 'letterChart' && (<div className="text-center"><div className="flex flex-wrap gap-3 justify-center mb-2">{item.content.split(',').map(letter => (<span key={letter} className="w-16 h-16 flex items-center justify-center bg-sky-100 text-sky-800 font-bold text-4xl rounded-lg font-lora">{letter}</span>))}</div>{item.helperText && <p className="text-center text-gray-500 mt-3 text-lg font-lora" dir="rtl">{item.helperText}</p>}</div>)}
-                        {item.type === 'ruleGuide' && Array.isArray(parsedContent(item.content)) && (<ul className="space-y-3">{parsedContent(item.content).map(ruleItem => (<li key={ruleItem.rule} className="flex items-start"><div className="ml-3"><p className="font-semibold text-gray-700">{ruleItem.rule}</p><p className="text-gray-500 text-sm font-lora" dir="rtl">{ruleItem.letters}</p></div></li>))}</ul>)}
-                        {item.type === 'dualChart' && parsedContent(item.content) && (<div className="grid grid-cols-1 gap-4"><div><h4 className="font-semibold text-green-700 mb-2">{parsedContent(item.content).moon.title}</h4><div className="flex flex-wrap gap-2">{parsedContent(item.content).moon.letters.split(',').map(l => <span key={l} className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-800 rounded font-bold">{l}</span>)}</div></div><div><h4 className="font-semibold text-amber-700 mb-2 mt-4">{parsedContent(item.content).sun.title}</h4><div className="flex flex-wrap gap-2">{parsedContent(item.content).sun.letters.split(',').map(l => <span key={l} className="w-8 h-8 flex items-center justify-center bg-amber-100 text-amber-800 rounded font-bold">{l}</span>)}</div></div></div>)}
-                    </div>
-                </div>
-            );
-        }
-        function Header({ setPage, onBack, showBackButton }) {
-            return (
-                <header className="bg-[#FDFBF7]/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-200">
-                    <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-                         {showBackButton ? (<button onClick={onBack} className="font-lora text-2xl font-bold text-gray-800 cursor-pointer">&larr; The Tajweed Compass</button>) : (<div className="font-lora text-2xl font-bold text-gray-800 cursor-pointer" onClick={() => setPage('home')}>The Tajweed Compass</div>)}
-                        <button onClick={() => setPage('toolkit')} className="bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 shadow-sm">The Toolkit</button>
-                    </nav>
-                </header>
-            );
-        }
-        function RoadmapStep({ step, index, onStepClick }) {
-            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100', 'bg-cyan-100'];
-            const cardColor = colors[index % colors.length];
-            return (
-                <div className="roadmap-item w-full max-w-md mx-auto">
-                    <div className="relative roadmap-connector">
-                        <div className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300 cursor-pointer`} onClick={() => onStepClick(step.id)}>
-                            <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{`Step ${index + 1}: ${step.title}`}</h3>
-                            <p className="text-gray-600 mb-4">{step.description}</p>
-                            <ul className="space-y-2">{step.lessons.map((lesson, i) => (<li key={i} className="flex items-start"><svg className="w-5 h-5 mr-2 text-teal-500 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span className="text-gray-700">{lesson}</span></li>))}</ul>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        function HomePage({ roadmapSteps, onStepClick }) {
-             const scrollToRoadmap = () => document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
-            return (
-                <div>
-                    <div className="text-center py-20 md:py-32 px-6 bg-gradient-to-b from-teal-50/50 to-[#FDFBF7]">
-                        <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
-                        <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
-                        <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
-                        <button onClick={scrollToRoadmap} className="bg-teal-600 text-white font-bold px-8 py-4 rounded-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg">Start Your Journey ↓</button>
-                    </div>
-                    <div id="roadmap" className="container mx-auto px-6 py-16">
-                         <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
-                        <div className="space-y-12 flex flex-col items-center">{roadmapSteps.map((step, index) => (<RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />))}</div>
-                    </div>
-                </div>
-            );
-        }
-        function Footer({ setPage, onHomeClick }) {
-            return (
-                <footer className="bg-gray-100 border-t mt-24">
-                    <div className="container mx-auto px-6 py-8 text-center text-gray-600">
-                        <p className="font-lora text-lg mb-4">"Dedicated to making the science of Tajweed accessible to every family."</p>
-                        <div className="space-x-6">
-                            <a href="#" onClick={(e) => { e.preventDefault(); onHomeClick(); }} className="hover:text-teal-600">Home</a>
-                            <a href="#" onClick={(e) => { e.preventDefault(); setPage('toolkit'); }} className="hover:text-teal-600">The Toolkit</a>
-                        </div>
-                    </div>
-                </footer>
-            );
-        }
-
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
 </body>
 </html>
-```
-
-After you update your `index.html` file with this new code, your website will start sending these valuable interaction details to your Firebase project. You'll be able to see the results in the **Firebase Console** under **Analytics > Events
