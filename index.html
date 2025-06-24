@@ -56,8 +56,9 @@
                 { id: 'step3', title: 'Vowels & Markings', description: "Discover how markings guide recitation.", lessons: ['Harakat', 'Sukun, Shaddah, Tanween'] },
                 { id: 'step4', title: 'The Art of Elongation (Madd)', description: "Master the rules of prolonging sounds.", lessons: ['Natural Madd', 'Secondary Madd'] },
                 { id: 'step5', title: 'The Rules of \'N\' and \'M\'', description: "Learn how Noon (ن) and Meem (م) interact.", lessons: ['Noon Sakinah Rules', 'Meem Sakinah Rules'] },
-                { id: 'step6', title: 'Special Letter Rules', description: "Dive into the distinct sounds of Qalqalah (echo) and Ghunnah (nasal hum).", lessons: ['Al-Qalqalah', 'Al-Ghunnah'] },
-                { id: 'step7', title: 'Advanced & Special Rules', description: "Learn the nuanced rules for specific letters and unique cases.", lessons: ['Rules of Ra', 'Rules of Lam', 'Special Cases'] },
+                { id: 'step6', title: 'Special Letter Rules', description: "Dive into the distinct sounds of Qalqalah and Ghunnah.", lessons: ['Al-Qalqalah', 'Al-Ghunnah'] },
+                { id: 'step7', title: 'Advanced & Special Rules', description: "Learn the nuanced rules for specific letters and cases.", lessons: ['Rules of Ra', 'Rules of Lam', 'Special Cases'] },
+                { id: 'step8', title: 'Perfecting the Pause (Waqf)', description: "Understand the art of stopping to preserve meaning.", lessons: ['Waqf Signs', 'The Breathless Pause (Sakt)'] },
             ],
             toolkitItems: []
         };
@@ -118,7 +119,7 @@
         }
 
         function RoadmapStep({ step, index, onStepClick }) {
-            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100'];
+            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100', 'bg-cyan-100'];
             const cardColor = colors[index % colors.length];
             return (
                 <div className="roadmap-item w-full max-w-md mx-auto">
@@ -211,7 +212,8 @@
                     'step4': 'step4_madd',
                     'step5': 'step5_nm_rules',
                     'step6': 'step6_special_rules',
-                    'step7': 'step7_advanced_rules', // Added Step 7
+                    'step7': 'step7_advanced_rules',
+                    'step8': 'step8_waqf_rules', // Added Step 8
                 };
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
@@ -237,7 +239,8 @@
                     'step4': 'step4_madd_details',
                     'step5': 'step5_nm_rules_details',
                     'step6': 'step6_special_rules_details',
-                    'step7': 'step7_advanced_rules_details', // Added Step 7
+                    'step7': 'step7_advanced_rules_details',
+                    'step8': 'step8_waqf_rules_details', // Added Step 8
                 };
 
                 const detailId = detailIdMap[stepId];
