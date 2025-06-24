@@ -55,12 +55,35 @@
         
         // --- Components ---
 
-        function LessonModal({ lesson, onClose, onShowDetails }) { /* ... same as before ... */ }
-        function DetailPage({ lesson, onBack }) { /* ... same as before ... */ }
-        function RoadmapStep({ step, index, onStepClick }) { /* ... same as before ... */ }
-        function HomePage({ roadmapSteps, onStepClick }) { /* ... same as before ... */ }
+        function LessonModal({ lesson, onClose, onShowDetails }) {
+            if (!lesson) return null;
+            return (
+                <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4" onClick={onClose}>
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
+                        <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                            <button onClick={() => onShowDetails(lesson.lessonId)} className="w-full bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300">Read Full Lesson</button>
+                            <button onClick={onClose} className="w-full bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-300">Close</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
 
-        // NEW: ToolkitPage Component
+        function DetailPage({ lesson, onBack }) {
+            return (
+                <div className="bg-white min-h-screen">
+                    <div className="container mx-auto px-6 py-12">
+                        <button onClick={onBack} className="inline-flex items-center gap-2 mb-8 text-teal-600 font-semibold hover:text-teal-800 transition-colors">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                           Back to Roadmap
+                        </button>
+                        {lesson ? <div className="prose max-w-none lg:prose-lg" dangerouslySetInnerHTML={{ __html: lesson.content }}></div> : <p>Loading lesson...</p>}
+                    </div>
+                </div>
+            );
+        }
+
         function ToolkitPage({ toolkitItems, onBack }) {
             return (
                 <div className="bg-gray-50/80 min-h-screen">
@@ -69,7 +92,6 @@
                             <h1 className="font-lora text-4xl md:text-5xl font-bold text-gray-800 mb-3">The Tajweed Toolkit</h1>
                             <p className="text-lg text-gray-600 max-w-3xl mx-auto">Your dashboard of "cheatsheets" for when you need an answer fast. Perfect for quick reference during practice.</p>
                         </div>
-
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {toolkitItems.map(item => <ToolkitCard key={item.id} item={item} />)}
                         </div>
@@ -78,15 +100,9 @@
             );
         }
 
-        // NEW: ToolkitCard Component
         function ToolkitCard({ item }) {
-            // Safely parse JSON content
             const parsedContent = (content) => {
-                try {
-                    return JSON.parse(content);
-                } catch (e) {
-                    return null;
-                }
+                try { return JSON.parse(content); } catch (e) { return null; }
             };
 
             return (
@@ -103,7 +119,6 @@
                                 {item.helperText && <p className="text-center text-gray-500 mt-3 text-lg font-lora" dir="rtl">{item.helperText}</p>}
                             </div>
                         )}
-
                         {item.type === 'ruleGuide' && Array.isArray(parsedContent(item.content)) && (
                              <ul className="space-y-3">
                                 {parsedContent(item.content).map(ruleItem => (
@@ -116,7 +131,6 @@
                                 ))}
                             </ul>
                         )}
-
                         {item.type === 'dualChart' && parsedContent(item.content) && (
                             <div className="grid grid-cols-1 gap-4">
                                 <div>
@@ -150,6 +164,49 @@
                         <button onClick={() => setPage('toolkit')} className="bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 shadow-sm">The Toolkit</button>
                     </nav>
                 </header>
+            );
+        }
+
+        function RoadmapStep({ step, index, onStepClick }) {
+            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100', 'bg-cyan-100'];
+            const cardColor = colors[index % colors.length];
+            return (
+                <div className="roadmap-item w-full max-w-md mx-auto">
+                    <div className="relative roadmap-connector">
+                        <div className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300 cursor-pointer`} onClick={() => onStepClick(step.id)}>
+                            <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{`Step ${index + 1}: ${step.title}`}</h3>
+                            <p className="text-gray-600 mb-4">{step.description}</p>
+                            <ul className="space-y-2">
+                                {step.lessons.map((lesson, i) => (
+                                    <li key={i} className="flex items-start">
+                                        <svg className="w-5 h-5 mr-2 text-teal-500 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span className="text-gray-700">{lesson}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        function HomePage({ roadmapSteps, onStepClick }) {
+             const scrollToRoadmap = () => document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
+            return (
+                <div>
+                    <div className="text-center py-20 md:py-32 px-6 bg-gradient-to-b from-teal-50/50 to-[#FDFBF7]">
+                        <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
+                        <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
+                        <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
+                        <button onClick={scrollToRoadmap} className="bg-teal-600 text-white font-bold px-8 py-4 rounded-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg">Start Your Journey ↓</button>
+                    </div>
+                    <div id="roadmap" className="container mx-auto px-6 py-16">
+                         <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
+                        <div className="space-y-12 flex flex-col items-center">
+                            {roadmapSteps.map((step, index) => (<RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />))}
+                        </div>
+                    </div>
+                </div>
             );
         }
 
@@ -191,7 +248,10 @@
                             if (roadmapList.length > 0) roadmapList.sort((a, b) => a.order - b.order);
                             if (toolkitList.length > 0) toolkitList.sort((a, b) => a.order - b.order);
 
-                            setData({ roadmapSteps: roadmapList.length > 0 ? roadmapList : defaultTajweedData.roadmapSteps, toolkitItems: toolkitList.length > 0 ? toolkitList : defaultTajweedData.toolkitItems });
+                            setData({ 
+                                roadmapSteps: roadmapList.length > 0 ? roadmapList : defaultTajweedData.roadmapSteps, 
+                                toolkitItems: toolkitList.length > 0 ? toolkitList : defaultTajweedData.toolkitItems 
+                            });
 
                         } catch (error) { console.error("Error fetching data:", error); }
                     }
@@ -200,9 +260,60 @@
                 fetchAllData();
             }, []);
 
-            const handleStepClick = async (stepId) => { /* ... same as before ... */ };
+            const handleStepClick = async (stepId) => {
+                if (!db || !doc) return alert("Database not connected.");
+                const lessonIdMap = { 
+                    'step1': 'step1_foundation', 
+                    'step2': 'step2_letters',
+                    'step3': 'step3_vowels',
+                    'step4': 'step4_madd',
+                    'step5': 'step5_nm_rules',
+                    'step6': 'step6_special_rules',
+                    'step7': 'step7_advanced_rules',
+                    'step8': 'step8_waqf_rules',
+                };
+                const lessonId = lessonIdMap[stepId];
+                if (!lessonId) return;
+                
+                try {
+                    const lessonRef = doc(db, "lessons", lessonId);
+                    const docSnap = await getDoc(lessonRef);
+                    if (docSnap.exists()) {
+                        setActiveLessonModal({ ...docSnap.data(), lessonId: stepId });
+                    } else { alert("Lesson summary not found."); }
+                } catch (error) { alert("Could not load lesson summary."); }
+            };
+            
             const handleCloseModal = () => setActiveLessonModal(null);
-            const handleShowDetails = async (stepId) => { /* ... same as before ... */ };
+
+            const handleShowDetails = async (stepId) => {
+                 if (!db || !doc) return alert("Database not connected.");
+                
+                const detailIdMap = { 
+                    'step1': 'step1_foundation_details',
+                    'step2': 'step2_letters_details',
+                    'step3': 'step3_vowels_details',
+                    'step4': 'step4_madd_details',
+                    'step5': 'step5_nm_rules_details',
+                    'step6': 'step6_special_rules_details',
+                    'step7': 'step7_advanced_rules_details',
+                    'step8': 'step8_waqf_rules_details',
+                };
+
+                const detailId = detailIdMap[stepId];
+                if (!detailId) return alert("No detailed lesson available for this step yet.");
+
+                try {
+                    const lessonRef = doc(db, "detailedLessons", detailId);
+                    const docSnap = await getDoc(lessonRef);
+                    if (docSnap.exists()) {
+                        setActiveDetailPage(docSnap.data());
+                        setActiveLessonModal(null);
+                        setPage('detail'); // Switch view to detail page
+                    } else { alert("Detailed lesson not found."); }
+                } catch (error) { alert("Could not load the detailed lesson."); }
+            };
+
             const handleBackToHome = () => {
                 setActiveDetailPage(null);
                 setPage('home');
@@ -227,77 +338,6 @@
                     </main>
                     <Footer setPage={setPage} /> 
                 </StrictMode>
-            );
-        }
-
-        // --- All component definitions for completeness ---
-        // (Includes the ones abbreviated above)
-        function LessonModal({ lesson, onClose, onShowDetails }) {
-            if (!lesson) return null;
-            return (
-                <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4" onClick={onClose}>
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
-                        <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                            <button onClick={() => onShowDetails(lesson.lessonId)} className="w-full bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300">Read Full Lesson</button>
-                            <button onClick={onClose} className="w-full bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-300">Close</button>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        function DetailPage({ lesson, onBack }) {
-            return (
-                <div className="bg-white min-h-screen">
-                    <div className="container mx-auto px-6 py-12">
-                        <button onClick={onBack} className="inline-flex items-center gap-2 mb-8 text-teal-600 font-semibold hover:text-teal-800 transition-colors">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                           Back to Roadmap
-                        </button>
-                        {lesson ? <div className="prose max-w-none lg:prose-lg" dangerouslySetInnerHTML={{ __html: lesson.content }}></div> : <p>Loading lesson...</p>}
-                    </div>
-                </div>
-            );
-        }
-        function RoadmapStep({ step, index, onStepClick }) {
-            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100', 'bg-cyan-100'];
-            const cardColor = colors[index % colors.length];
-            return (
-                <div className="roadmap-item w-full max-w-md mx-auto">
-                    <div className="relative roadmap-connector">
-                        <div className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300 cursor-pointer`} onClick={() => onStepClick(step.id)}>
-                            <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{`Step ${index + 1}: ${step.title}`}</h3>
-                            <p className="text-gray-600 mb-4">{step.description}</p>
-                            <ul className="space-y-2">
-                                {step.lessons.map((lesson, i) => (
-                                    <li key={i} className="flex items-start">
-                                        <svg className="w-5 h-5 mr-2 text-teal-500 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        <span className="text-gray-700">{lesson}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        function HomePage({ roadmapSteps, onStepClick }) {
-             const scrollToRoadmap = () => document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
-            return (
-                <div>
-                    <div className="text-center py-20 md:py-32 px-6 bg-gradient-to-b from-teal-50/50 to-[#FDFBF7]">
-                        <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
-                        <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
-                        <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
-                        <button onClick={scrollToRoadmap} className="bg-teal-600 text-white font-bold px-8 py-4 rounded-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg">Start Your Journey ↓</button>
-                    </div>
-                    <div id="roadmap" className="container mx-auto px-6 py-16">
-                         <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
-                        <div className="space-y-12 flex flex-col items-center">
-                            {roadmapSteps.map((step, index) => (<RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />))}
-                        </div>
-                    </div>
-                </div>
             );
         }
 
