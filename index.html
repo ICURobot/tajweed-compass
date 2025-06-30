@@ -133,7 +133,7 @@
         }
 
         function RoadmapStep({ step, index, onStepClick }) {
-            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100', 'bg-cyan-100'];
+            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100', 'bg-cyan-100', 'bg-lime-100'];
             const cardColor = colors[index % colors.length];
             return (
                 <div className="roadmap-item w-full max-w-md mx-auto">
@@ -217,6 +217,7 @@
                     'step1': 'step1_foundation', 'step2': 'step2_letters', 'step3': 'step3_vowels',
                     'step4': 'step4_madd', 'step5': 'step5_nm_rules', 'step6': 'step6_special_rules',
                     'step7': 'step7_advanced_rules', 'step8': 'step8_waqf_rules',
+                    'step9': 'step9_relationships' // Added Step 9
                 };
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
@@ -236,6 +237,7 @@
                     'step1': 'step1_foundation_details', 'step2': 'step2_letters_details', 'step3': 'step3_vowels_details',
                     'step4': 'step4_madd_details', 'step5': 'step5_nm_rules_details', 'step6': 'step6_special_rules_details',
                     'step7': 'step7_advanced_rules_details', 'step8': 'step8_waqf_rules_details',
+                    'step9': 'step9_relationships_details' // Added Step 9
                 };
                 const detailId = detailIdMap[stepId];
                 if (!detailId) return alert("No detailed lesson available for this step yet.");
