@@ -72,12 +72,12 @@
             
             // Enhanced data fetching with better error handling
             async fetchWithCache(collectionName, orderByField = 'order') {
-                if (!db || !collection) {
+                if (!this.db || !collection) {
                     throw new Error('Firebase not initialized');
                 }
                 
                 try {
-                    const col = collection(db, collectionName);
+                    const col = collection(this.db, collectionName);
                     const q = query(col, orderBy(orderByField));
                     const snapshot = await getDocs(q);
                     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -91,12 +91,12 @@
             
             // Enhanced lesson fetching
             async fetchLesson(lessonId, collectionName = 'lessons') {
-                if (!db || !doc) {
+                if (!this.db || !doc) {
                     throw new Error('Firebase not initialized');
                 }
                 
                 try {
-                    const lessonRef = doc(db, collectionName, lessonId);
+                    const lessonRef = doc(this.db, collectionName, lessonId);
                     const docSnap = await getDoc(lessonRef);
                     const result = docSnap.exists() ? docSnap.data() : null;
                     if (result) {
