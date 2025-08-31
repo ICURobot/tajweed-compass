@@ -2,8 +2,8 @@
 // This file reads from Netlify environment variables for security
 // Set these in your Netlify dashboard under Site settings > Environment variables
 
-// For Netlify, you'll need to set these environment variables:
-// VITE_FIREBASE_API_KEY, VITE_FIREBASE_AUTH_DOMAIN, etc.
+// For static sites on Netlify, we need to use a different approach
+// The environment variables are injected into the HTML during build
 
 export const firebaseConfig = {
     apiKey: "YOUR_API_KEY", // Set VITE_FIREBASE_API_KEY in Netlify

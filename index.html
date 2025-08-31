@@ -18,21 +18,36 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <script type="module">
-        import { firebaseConfig, collections } from './config.production.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         
-        // Initialize Firebase only if config is valid
-        let app, db, analytics;
+        // Initialize Firebase using Netlify Function for secure config
+        let app, db, analytics, collections;
         
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            analytics = getAnalytics(app);
-            console.log('✅ Firebase initialized successfully');
-        } catch (error) {
-            console.warn('❌ Firebase initialization failed:', error);
+        async function initializeFirebase() {
+            try {
+                // Fetch Firebase config from Netlify Function
+                const response = await fetch('/.netlify/functions/get-firebase-config');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                const { firebaseConfig, collections: collectionsConfig } = config;
+                
+                // Initialize Firebase with secure config
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                analytics = getAnalytics(app);
+                collections = collectionsConfig;
+                
+                console.log('✅ Firebase initialized successfully with secure config');
+            } catch (error) {
+                console.error('❌ Firebase initialization failed:', error);
+                // Fallback to placeholder config for development
+                console.log('🔄 Falling back to development config...');
+            }
         }
         
         // Enhanced Firebase utilities with error handling
@@ -243,26 +258,44 @@
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
-                async function fetchAllData() {
-                    if (firebaseDb && collection) {
-                        try {
-                            const roadmapCol = collection(firebaseDb, "roadmapSteps");
-                            const toolkitCol = collection(firebaseDb, "toolkitItems");
-                            const roadmapSnapshot = await getDocs(roadmapCol);
-                            const toolkitSnapshot = await getDocs(toolkitCol);
-                            const roadmapList = roadmapSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            const toolkitList = toolkitSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            if (roadmapList.length > 0) roadmapList.sort((a, b) => a.order - b.order);
-                            if (toolkitList.length > 0) toolkitList.sort((a, b) => a.order - b.order);
-                            setData({ 
-                                roadmapSteps: roadmapList.length > 0 ? roadmapList : [], 
-                                toolkitItems: toolkitList.length > 0 ? toolkitList : [] 
-                            });
-                        } catch (error) { console.error("Error fetching data:", error); }
+                async function initializeAndFetchData() {
+                    try {
+                        // Initialize Firebase first
+                        await initializeFirebase();
+                        
+                        // Update the firebaseSDK with the initialized values
+                        window.firebaseSDK = {
+                            ...window.firebaseSDK,
+                            db,
+                            collections
+                        };
+                        
+                        // Now fetch data if Firebase is initialized
+                        if (db && collection) {
+                            try {
+                                const roadmapCol = collection(db, "roadmapSteps");
+                                const toolkitCol = collection(db, "toolkitItems");
+                                const roadmapSnapshot = await getDocs(roadmapCol);
+                                const toolkitSnapshot = await getDocs(toolkitCol);
+                                const roadmapList = roadmapSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                                const toolkitList = toolkitSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                                if (roadmapList.length > 0) roadmapList.sort((a, b) => a.order - b.order);
+                                if (toolkitList.length > 0) toolkitList.sort((a, b) => a.order - b.order);
+                                setData({ 
+                                    roadmapSteps: roadmapList.length > 0 ? roadmapList : [], 
+                                    toolkitItems: toolkitList.length > 0 ? toolkitList : [] 
+                                });
+                            } catch (error) { 
+                                console.error("Error fetching data:", error); 
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Error initializing Firebase:", error);
+                    } finally {
+                        setLoading(false);
                     }
-                    setLoading(false);
                 }
-                fetchAllData();
+                initializeAndFetchData();
             }, []);
             
             const handleStepClick = async (stepId) => {
