@@ -1,15 +1,16 @@
-// Example Firebase Configuration
-// This file shows the structure without real values
-// Copy this to config.js and fill in your actual Firebase details
+// Firebase Configuration Example
+// Copy this file to config.js and fill in your real values
+// IMPORTANT: config.js is in .gitignore to keep your API keys secret
 
 export const firebaseConfig = {
-    apiKey: "YOUR_ACTUAL_API_KEY_HERE",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID",
-    measurementId: "YOUR_MEASUREMENT_ID"
+    // Replace these with your actual Firebase project values
+    apiKey: "YOUR_API_KEY_HERE", // Get this from Firebase Console > Project Settings > General > Your Apps
+    authDomain: "your-project.firebaseapp.com", // Your project ID + .firebaseapp.com
+    projectId: "your-project-id", // Your Firebase project ID
+    storageBucket: "your-project.appspot.com", // Your project ID + .appspot.com
+    messagingSenderId: "123456789", // Your Firebase messaging sender ID
+    appId: "1:123456789:web:abcdef123456", // Your Firebase app ID
+    measurementId: "G-XXXXXXXXXX" // Your Firebase measurement ID
 };
 
 // Firebase Security Rules URL (for reference)
