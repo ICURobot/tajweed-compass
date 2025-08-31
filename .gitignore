@@ -7,6 +7,15 @@ config.js
 .env.production
 .env.*
 
+# Documentation with sensitive examples
+DEPLOYMENT.md
+
+# Firebase Admin SDK files (contain sensitive credentials)
+firebase-manager.js
+package.json
+package-lock.json
+node_modules/
+
 # Node modules (if you add them later)
 node_modules/
 

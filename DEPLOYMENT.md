@@ -11,13 +11,13 @@ Edit `config.production.js` and replace the placeholders with your real values:
 
 ```javascript
 export const firebaseConfig = {
-    apiKey: "AIzaSyAUrT-0tL_wj275YGQyRhyGYmWWTGs0BSM", // Your real API key
-    authDomain: "tajweed-compass.firebaseapp.com", // Your real domain
-    projectId: "tajweed-compass", // Your real project ID
-    storageBucket: "tajweed-compass.appspot.com", // Your real storage bucket
-    messagingSenderId: "81035085376", // Your real sender ID
-    appId: "1:81035085376:web:c03f7018074f95124981a5", // Your real app ID
-    measurementId: "G-MN26V7G16H" // Your real measurement ID
+    apiKey: "YOUR_ACTUAL_API_KEY_HERE", // Replace with your real API key
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com", // Replace with your real domain
+    projectId: "YOUR_PROJECT_ID", // Replace with your real project ID
+    storageBucket: "YOUR_PROJECT_ID.appspot.com", // Replace with your real storage bucket
+    messagingSenderId: "YOUR_SENDER_ID", // Replace with your real sender ID
+    appId: "YOUR_APP_ID", // Replace with your real app ID
+    measurementId: "YOUR_MEASUREMENT_ID" // Replace with your real measurement ID
 };
 ```
 
@@ -27,6 +27,7 @@ Make sure these files are NEVER committed:
 - ✅ `.env` (environment variables)
 - ✅ `.env.local` (local environment)
 - ✅ `.env.production` (production environment)
+- ✅ `DEPLOYMENT.md` (contains sensitive examples)
 
 ## **🚀 Deployment Options:**
 
