@@ -130,7 +130,15 @@
     <script type="text/babel">
         const { useState, useEffect, StrictMode } = React;
         
-        const { db: firebaseDb, collection, getDocs, doc, getDoc, analytics: firebaseAnalytics, logEvent } = window.firebaseSDK || {};
+        // Wait for Firebase to be ready
+        let firebaseReady = false;
+        let firebaseDb = null;
+        let collection = null;
+        let getDocs = null;
+        let doc = null;
+        let getDoc = null;
+        let firebaseAnalytics = null;
+        let logEvent = null;
 
         const defaultTajweedData = {
             roadmapSteps: [],
@@ -271,22 +279,24 @@
                         // Initialize Firebase first
                         await window.initializeFirebase();
                         
-                        // Update the firebaseSDK with the initialized values
-                        window.firebaseSDK = {
-                            ...window.firebaseSDK,
-                            db,
-                            collections
-                        };
-                        
-                        // Also make db and collections available globally
-                        window.db = db;
-                        window.collections = collections;
+                        // Get Firebase functions from the SDK
+                        const sdk = window.firebaseSDK;
+                        if (sdk) {
+                            firebaseDb = sdk.db;
+                            collection = sdk.collection;
+                            getDocs = sdk.getDocs;
+                            doc = sdk.doc;
+                            getDoc = sdk.getDoc;
+                            firebaseAnalytics = sdk.analytics;
+                            logEvent = sdk.logEvent;
+                            firebaseReady = true;
+                        }
                         
                         // Now fetch data if Firebase is initialized
-                        if (window.db && collection) {
+                        if (firebaseDb && collection) {
                             try {
-                                const roadmapCol = collection(window.db, "roadmapSteps");
-                                const toolkitCol = collection(window.db, "toolkitItems");
+                                const roadmapCol = collection(firebaseDb, "roadmapSteps");
+                                const toolkitCol = collection(firebaseDb, "toolkitItems");
                                 const roadmapSnapshot = await getDocs(roadmapCol);
                                 const toolkitSnapshot = await getDocs(toolkitCol);
                                 const roadmapList = roadmapSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -311,7 +321,7 @@
             }, []);
             
             const handleStepClick = async (stepId) => {
-                if (!window.db || !doc) return alert("Database not connected.");
+                if (!firebaseDb || !doc) return alert("Database not connected.");
                 const lessonIdMap = { 
                     'step1': 'step1_foundation', 'step2': 'step2_letters', 'step3': 'step3_vowels',
                     'step4': 'step4_madd', 'step5': 'step5_nm_rules', 'step6': 'step6_special_rules',
@@ -321,7 +331,7 @@
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
                 try {
-                    const lessonRef = doc(window.db, "lessons", lessonId);
+                    const lessonRef = doc(firebaseDb, "lessons", lessonId);
                     const docSnap = await getDoc(lessonRef);
                     if (docSnap.exists()) {
                         setActiveLessonModal({ ...docSnap.data(), lessonId: stepId });
@@ -332,7 +342,7 @@
             };
             
             const handleShowDetails = async (stepId) => {
-                 if (!window.db || !doc) return alert("Database not connected.");
+                 if (!firebaseDb || !doc) return alert("Database not connected.");
                 const detailIdMap = { 
                     'step1': 'step1_foundation_details', 'step2': 'step2_letters_details', 'step3': 'step3_vowels_details',
                     'step4': 'step4_madd_details', 'step5': 'step5_nm_rules_details', 'step6': 'step6_special_rules_details',
@@ -342,7 +352,7 @@
                 const detailId = detailIdMap[stepId];
                 if (!detailId) return alert("No detailed lesson available for this step yet.");
                 try {
-                    const lessonRef = doc(window.db, "detailedLessons", detailId);
+                    const lessonRef = doc(firebaseDb, "detailedLessons", detailId);
                     const docSnap = await getDoc(lessonRef);
                     if (docSnap.exists()) {
                         setActiveDetailPage(docSnap.data());
