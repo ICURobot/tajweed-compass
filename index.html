@@ -39,8 +39,15 @@
                 // Initialize Firebase with secure config
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
-                analytics = getAnalytics(app);
+                // Temporarily disable analytics to avoid 403 errors
+                // analytics = getAnalytics(app);
+                analytics = null;
                 collections = collectionsConfig;
+                
+                // Update firebaseUtils with the initialized values
+                firebaseUtils.db = db;
+                firebaseUtils.analytics = analytics;
+                firebaseUtils.collections = collections;
                 
                 console.log('✅ Firebase initialized successfully with secure config');
             } catch (error) {
@@ -51,17 +58,17 @@
         }
         
         // Enhanced Firebase utilities with error handling
-        const firebaseUtils = {
-            db,
+        let firebaseUtils = {
+            db: null,
             collection,
             getDocs,
             doc,
             getDoc,
             query,
             orderBy,
-            analytics,
+            analytics: null,
             logEvent,
-            collections,
+            collections: null,
             
             // Enhanced data fetching with better error handling
             async fetchWithCache(collectionName, orderByField = 'order') {
