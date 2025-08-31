@@ -271,11 +271,15 @@
                             collections
                         };
                         
+                        // Also make db and collections available globally
+                        window.db = db;
+                        window.collections = collections;
+                        
                         // Now fetch data if Firebase is initialized
-                        if (db && collection) {
+                        if (window.db && collection) {
                             try {
-                                const roadmapCol = collection(db, "roadmapSteps");
-                                const toolkitCol = collection(db, "toolkitItems");
+                                const roadmapCol = collection(window.db, "roadmapSteps");
+                                const toolkitCol = collection(window.db, "toolkitItems");
                                 const roadmapSnapshot = await getDocs(roadmapCol);
                                 const toolkitSnapshot = await getDocs(toolkitCol);
                                 const roadmapList = roadmapSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -300,7 +304,7 @@
             }, []);
             
             const handleStepClick = async (stepId) => {
-                if (!firebaseDb || !doc) return alert("Database not connected.");
+                if (!window.db || !doc) return alert("Database not connected.");
                 const lessonIdMap = { 
                     'step1': 'step1_foundation', 'step2': 'step2_letters', 'step3': 'step3_vowels',
                     'step4': 'step4_madd', 'step5': 'step5_nm_rules', 'step6': 'step6_special_rules',
@@ -310,7 +314,7 @@
                 const lessonId = lessonIdMap[stepId];
                 if (!lessonId) return;
                 try {
-                    const lessonRef = doc(firebaseDb, "lessons", lessonId);
+                    const lessonRef = doc(window.db, "lessons", lessonId);
                     const docSnap = await getDoc(lessonRef);
                     if (docSnap.exists()) {
                         setActiveLessonModal({ ...docSnap.data(), lessonId: stepId });
@@ -320,7 +324,7 @@
             };
             
             const handleShowDetails = async (stepId) => {
-                 if (!firebaseDb || !doc) return alert("Database not connected.");
+                 if (!window.db || !doc) return alert("Database not connected.");
                 const detailIdMap = { 
                     'step1': 'step1_foundation_details', 'step2': 'step2_letters_details', 'step3': 'step3_vowels_details',
                     'step4': 'step4_madd_details', 'step5': 'step5_nm_rules_details', 'step6': 'step6_special_rules_details',
@@ -330,7 +334,7 @@
                 const detailId = detailIdMap[stepId];
                 if (!detailId) return alert("No detailed lesson available for this step yet.");
                 try {
-                    const lessonRef = doc(firebaseDb, "detailedLessons", detailId);
+                    const lessonRef = doc(window.db, "detailedLessons", detailId);
                     const docSnap = await getDoc(lessonRef);
                     if (docSnap.exists()) {
                         setActiveDetailPage(docSnap.data());
