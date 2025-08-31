@@ -1,10 +1,11 @@
 # Firebase Configuration (contains API keys)
 config.js
 
-# Environment variables
+# Environment files (NEVER commit these!)
 .env
 .env.local
 .env.production
+.env.*
 
 # Node modules (if you add them later)
 node_modules/
