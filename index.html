@@ -106,6 +106,7 @@
         };
         
         window.firebaseSDK = firebaseUtils;
+        window.initializeFirebase = initializeFirebase;
     </script>
     
     <style>
@@ -261,7 +262,7 @@
                 async function initializeAndFetchData() {
                     try {
                         // Initialize Firebase first
-                        await initializeFirebase();
+                        await window.initializeFirebase();
                         
                         // Update the firebaseSDK with the initialized values
                         window.firebaseSDK = {
