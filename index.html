@@ -39,9 +39,8 @@
                 // Initialize Firebase with secure config
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
-                // Temporarily disable analytics to avoid 403 errors
-                // analytics = getAnalytics(app);
-                analytics = null;
+                // Re-enable analytics now that everything is working
+                analytics = getAnalytics(app);
                 collections = collectionsConfig;
                 
                 // Update firebaseUtils with the initialized values
@@ -335,8 +334,7 @@
                     const docSnap = await getDoc(lessonRef);
                     if (docSnap.exists()) {
                         setActiveLessonModal({ ...docSnap.data(), lessonId: stepId });
-                        // Temporarily disabled analytics
-                        // if(firebaseAnalytics && logEvent) logEvent(firebaseAnalytics, 'select_content', { content_type: 'lesson_summary', item_id: stepId });
+                        if(firebaseAnalytics && logEvent) logEvent(firebaseAnalytics, 'select_content', { content_type: 'lesson_summary', item_id: stepId });
                     } else { alert("Lesson summary not found."); }
                 } catch (error) { alert("Could not load lesson summary."); }
             };
@@ -358,8 +356,7 @@
                         setActiveDetailPage(docSnap.data());
                         setActiveLessonModal(null);
                         setPage('detail');
-                        // Temporarily disabled analytics
-                        // if(firebaseAnalytics && logEvent) logEvent(firebaseAnalytics, 'view_item', { item_id: stepId, item_name: docSnap.data().title });
+                        if(firebaseAnalytics && logEvent) logEvent(firebaseAnalytics, 'view_item', { item_id: stepId, item_name: docSnap.data().title });
                     } else { alert("Detailed lesson not found."); }
                 } catch (error) { alert("Could not load the detailed lesson."); }
             };
@@ -367,8 +364,7 @@
             const handleSetPage = (pageName) => {
                 setPage(pageName);
                 if (pageName === 'toolkit') {
-                    // Temporarily disabled analytics
-                    // if(firebaseAnalytics && logEvent) logEvent(firebaseAnalytics, 'view_item_list', { item_list_id: 'toolkit', item_list_name: 'The Toolkit' });
+                    if(firebaseAnalytics && logEvent) logEvent(firebaseAnalytics, 'view_item_list', { item_list_id: 'toolkit', item_list_name: 'The Toolkit' });
                 }
             }
 
