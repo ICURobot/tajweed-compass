@@ -131,11 +131,76 @@
     </script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #FDFBF7; color: #3f3c3a; }
+        /* Glassmorphism Design System */
+        :root {
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FDFBF7 0%, #f0f9ff 25%, #ecfdf5 50%, #fef7ff 75%, #FDFBF7 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .font-lora { font-family: 'Lora', serif; }
         .prose h1, .prose h2, .prose h3 { font-family: 'Lora', serif; }
-        .roadmap-connector::before { content: ''; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); width: 2px; height: 3rem; background-color: #d1d5db; }
-        .roadmap-item:last-child .roadmap-connector::before { display: none; }
+
+        /* Colorful roadmap cards - solid colors matching live site */
+        .roadmap-card-1 {
+            background: #E3F2FD; /* Light blue */
+            border: 2px solid #2196F3;
+        }
+
+        .roadmap-card-2 {
+            background: #E8F5E8; /* Light green */
+            border: 2px solid #4CAF50;
+        }
+
+        .roadmap-card-3 {
+            background: #FFF8E1; /* Light yellow */
+            border: 2px solid #FFC107;
+        }
+
+        .roadmap-card-4 {
+            background: #FCE4EC; /* Light pink */
+            border: 2px solid #E91E63;
+        }
+
+        .roadmap-card-5 {
+            background: #E8EAF6; /* Light purple */
+            border: 2px solid #3F51B5;
+        }
+
+        .roadmap-card-6 {
+            background: #FCE4EC; /* Light pink */
+            border: 2px solid #E91E63;
+        }
+
+        .roadmap-card-7 {
+            background: #E8EAF6; /* Light purple */
+            border: 2px solid #3F51B5;
+        }
+
+        .roadmap-card-8 {
+            background: #E0F2F1; /* Light teal */
+            border: 2px solid #009688;
+        }
+
+        .roadmap-card-9 {
+            background: #F3E5F5; /* Light lime green */
+            border: 2px solid #8BC34A;
+        }
     </style>
 </head>
 <body>
@@ -165,11 +230,11 @@
             if (!lesson) return null;
             return (
                 <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4" onClick={onClose}>
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                         <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
                         <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                            <button onClick={() => onShowDetails(lesson.lessonId)} className="w-full bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300">Read Full Lesson</button>
-                            <button onClick={onClose} className="w-full bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-300">Close</button>
+                            <button onClick={() => onShowDetails(lesson.lessonId)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 w-full">Read Full Lesson</button>
+                            <button onClick={onClose} className="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 w-full">Close</button>
                         </div>
                     </div>
                 </div>
@@ -178,13 +243,21 @@
 
         function DetailPage({ lesson, onBack }) {
             return (
-                <div className="bg-white min-h-screen">
+                <div className="min-h-screen">
                     <div className="container mx-auto px-6 py-12">
-                        <button onClick={onBack} className="inline-flex items-center gap-2 mb-8 text-teal-600 font-semibold hover:text-teal-800 transition-colors">
+                        <button onClick={onBack} className="bg-white text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 inline-flex items-center gap-2 mb-8 font-semibold transition-colors">
                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                            Back to Roadmap
                         </button>
-                        {lesson ? <div className="prose max-w-none lg:prose-lg" dangerouslySetInnerHTML={{ __html: lesson.content }}></div> : <p>Loading lesson...</p>}
+                        {lesson ? (
+                            <div className="bg-white rounded-lg p-8">
+                                <div className="prose max-w-none lg:prose-lg" dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-lg p-8 text-center">
+                                <p className="text-gray-800">Loading lesson...</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
@@ -192,11 +265,13 @@
         
         function ToolkitPage({ toolkitItems }) {
             return (
-                <div className="bg-gray-50/80 min-h-screen">
+                <div className="min-h-screen">
                     <div className="container mx-auto px-6 py-16">
                         <div className="text-center mb-12">
-                            <h1 className="font-lora text-4xl md:text-5xl font-bold text-gray-800 mb-3">The Tajweed Toolkit</h1>
-                            <p className="text-lg text-gray-600 max-w-3xl mx-auto">Your dashboard of "cheatsheets" for when you need an answer fast. Perfect for quick reference during practice.</p>
+                            <div className="bg-white rounded-lg p-8 max-w-4xl mx-auto">
+                                <h1 className="font-lora text-4xl md:text-5xl font-bold text-gray-800 mb-3">The Tajweed Toolkit</h1>
+                                <p className="text-lg text-gray-600 max-w-3xl mx-auto">Your dashboard of "cheatsheets" for when you need an answer fast. Perfect for quick reference during practice.</p>
+                            </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {toolkitItems.map(item => <ToolkitCard key={item.id} item={item} />)}
@@ -209,12 +284,57 @@
         function ToolkitCard({ item }) {
             const parsedContent = (content) => { try { return JSON.parse(content); } catch (e) { return null; } };
             return (
-                <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200/80 h-full flex flex-col">
+                <div className="bg-white rounded-lg p-6 h-full flex flex-col shadow-lg">
                     <h3 className="font-lora text-xl font-bold text-gray-800 mb-4">{item.title}</h3>
                     <div className="flex-grow">
-                        {item.type === 'letterChart' && (<div className="text-center"><div className="flex flex-wrap gap-3 justify-center mb-2">{item.content.split(',').map(letter => (<span key={letter} className="w-16 h-16 flex items-center justify-center bg-sky-100 text-sky-800 font-bold text-4xl rounded-lg font-lora">{letter}</span>))}</div>{item.helperText && <p className="text-center text-gray-500 mt-3 text-lg font-lora" dir="rtl">{item.helperText}</p>}</div>)}
-                        {item.type === 'ruleGuide' && Array.isArray(parsedContent(item.content)) && (<ul className="space-y-3">{parsedContent(item.content).map(ruleItem => (<li key={ruleItem.rule} className="flex items-start"><div className="ml-3"><p className="font-semibold text-gray-700">{ruleItem.rule}</p><p className="text-gray-500 text-sm font-lora" dir="rtl">{ruleItem.letters}</p></div></li>))}</ul>)}
-                        {item.type === 'dualChart' && parsedContent(item.content) && (<div className="grid grid-cols-1 gap-4"><div><h4 className="font-semibold text-green-700 mb-2">{parsedContent(item.content).moon.title}</h4><div className="flex flex-wrap gap-2">{parsedContent(item.content).moon.letters.split(',').map(l => <span key={l} className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-800 rounded font-bold">{l}</span>)}</div></div><div><h4 className="font-semibold text-amber-700 mb-2 mt-4">{parsedContent(item.content).sun.title}</h4><div className="flex flex-wrap gap-2">{parsedContent(item.content).sun.letters.split(',').map(l => <span key={l} className="w-8 h-8 flex items-center justify-center bg-amber-100 text-amber-800 rounded font-bold">{l}</span>)}</div></div></div>)}
+                        {item.type === 'letterChart' && (
+                            <div className="text-center">
+                                <div className="flex flex-wrap gap-3 justify-center mb-2">
+                                    {item.content.split(',').map(letter => (
+                                        <span key={letter} className="w-16 h-16 flex items-center justify-center bg-sky-100 text-sky-800 font-bold text-4xl rounded-lg font-lora border border-sky-200">
+                                            {letter}
+                                        </span>
+                                    ))}
+                                </div>
+                                {item.helperText && <p className="text-center text-gray-500 mt-3 text-lg font-lora" dir="rtl">{item.helperText}</p>}
+                            </div>
+                        )}
+                        {item.type === 'ruleGuide' && Array.isArray(parsedContent(item.content)) && (
+                            <ul className="space-y-3">
+                                {parsedContent(item.content).map(ruleItem => (
+                                    <li key={ruleItem.rule} className="flex items-start">
+                                        <div className="ml-3">
+                                            <p className="font-semibold text-gray-700">{ruleItem.rule}</p>
+                                            <p className="text-gray-500 text-sm font-lora" dir="rtl">{ruleItem.letters}</p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {item.type === 'dualChart' && parsedContent(item.content) && (
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <h4 className="font-semibold text-green-700 mb-2">{parsedContent(item.content).moon.title}</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {parsedContent(item.content).moon.letters.split(',').map(l => 
+                                            <span key={l} className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-800 rounded font-bold">
+                                                {l}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-amber-700 mb-2 mt-4">{parsedContent(item.content).sun.title}</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {parsedContent(item.content).sun.letters.split(',').map(l => 
+                                            <span key={l} className="w-8 h-8 flex items-center justify-center bg-amber-100 text-amber-800 rounded font-bold">
+                                                {l}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
@@ -222,25 +342,55 @@
 
         function Header({ setPage, onBack, showBackButton }) {
             return (
-                <header className="bg-[#FDFBF7]/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-200">
+                <header className="bg-white sticky top-0 z-40 m-4 rounded-2xl shadow-lg">
                     <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-                         {showBackButton ? (<button onClick={onBack} className="font-lora text-2xl font-bold text-gray-800 cursor-pointer">&larr; The Tajweed Compass</button>) : (<div className="font-lora text-2xl font-bold text-gray-800 cursor-pointer" onClick={() => setPage('home')}>The Tajweed Compass</div>)}
-                        <button onClick={() => setPage('toolkit')} className="bg-teal-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-teal-700 transition-colors duration-300 shadow-sm">The Toolkit</button>
+                         {showBackButton ? (
+                                                      <button onClick={onBack} className="font-lora text-2xl font-bold text-gray-800 cursor-pointer hover:text-teal-600 transition-colors flex items-center gap-3">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                             <img src="tajweed-compass-logo.png" alt="Tajweed Compass Logo" className="h-12 w-auto" />
+                             The Tajweed Compass
+                         </button>
+                     ) : (
+                         <div className="font-lora text-2xl font-bold text-gray-800 cursor-pointer hover:text-teal-600 transition-colors flex items-center gap-3" onClick={() => setPage('home')}>
+                             <img src="tajweed-compass-logo.png" alt="Tajweed Compass Logo" className="h-12 w-auto" />
+                             The Tajweed Compass
+                         </div>
+                     )}
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => setPage('toolkit')} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                                The Toolkit
+                            </button>
+                            <a href="https://buymeacoffee.com/fushaconnect" target="_blank" rel="noopener noreferrer" className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 font-semibold transition-colors">
+                                ☕ Support Us
+                            </a>
+                        </div>
                     </nav>
                 </header>
             );
         }
 
         function RoadmapStep({ step, index, onStepClick }) {
-            const colors = ['bg-sky-100', 'bg-green-100', 'bg-amber-100', 'bg-rose-100', 'bg-indigo-100', 'bg-pink-100', 'bg-purple-100', 'bg-cyan-100', 'bg-lime-100'];
-            const cardColor = colors[index % colors.length];
+            const cardColors = [
+                'roadmap-card-1', 'roadmap-card-2', 'roadmap-card-3', 'roadmap-card-4', 'roadmap-card-5',
+                'roadmap-card-6', 'roadmap-card-7', 'roadmap-card-8', 'roadmap-card-9'
+            ];
+            
+            const cardColorClass = cardColors[index % cardColors.length];
+            
             return (
                 <div className="roadmap-item w-full max-w-md mx-auto">
-                    <div className="relative roadmap-connector">
-                        <div className={`p-6 md:p-8 rounded-2xl shadow-lg border border-gray-200/50 ${cardColor} transition-transform hover:scale-105 duration-300 cursor-pointer`} onClick={() => onStepClick(step.id)}>
+                    <div className="relative">
+                        <div className={`${cardColorClass} rounded-lg p-6 md:p-8 shadow-lg transition-transform hover:scale-105 duration-300 cursor-pointer`} onClick={() => onStepClick(step.id)}>
                             <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{`Step ${index + 1}: ${step.title}`}</h3>
                             <p className="text-gray-600 mb-4">{step.description}</p>
-                            <ul className="space-y-2">{step.lessons.map((lesson, i) => (<li key={i} className="flex items-start"><svg className="w-5 h-5 mr-2 text-teal-500 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span className="text-gray-700">{lesson}</span></li>))}</ul>
+                            <ul className="space-y-2">{step.lessons.map((lesson, i) => (
+                                <li key={i} className="flex items-start">
+                                    <svg className="w-5 h-5 mr-2 text-green-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span className="text-gray-700">{lesson}</span>
+                                </li>
+                            ))}</ul>
                         </div>
                     </div>
                 </div>
@@ -251,11 +401,15 @@
              const scrollToRoadmap = () => document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
             return (
                 <div>
-                    <div className="text-center py-20 md:py-32 px-6 bg-gradient-to-b from-teal-50/50 to-[#FDFBF7]">
-                        <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
-                        <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
-                        <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
-                        <button onClick={scrollToRoadmap} className="bg-teal-600 text-white font-bold px-8 py-4 rounded-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg">Start Your Journey ↓</button>
+                    <div className="text-center py-20 md:py-32 px-6">
+                        <div className="bg-white rounded-lg max-w-4xl mx-auto p-12 mb-8 shadow-lg">
+                            <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
+                            <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
+                            <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
+                            <button onClick={scrollToRoadmap} className="bg-teal-600 text-white text-lg font-bold px-8 py-4 rounded-lg hover:bg-teal-700">
+                                Start Your Journey ↓
+                            </button>
+                        </div>
                     </div>
                     <div id="roadmap" className="container mx-auto px-6 py-16">
                          <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
@@ -267,13 +421,16 @@
 
         function Footer({ setPage, onHomeClick }) {
             return (
-                <footer className="bg-gray-100 border-t mt-24">
+                <footer className="bg-white mt-24 mx-4 rounded-2xl shadow-lg">
                     <div className="container mx-auto px-6 py-8 text-center text-gray-600">
                         <p className="font-lora text-lg mb-4">"Dedicated to making the science of Tajweed accessible to every family."</p>
-                        <div className="space-x-6">
-                            <a href="#" onClick={(e) => { e.preventDefault(); onHomeClick(); }} className="hover:text-teal-600">Home</a>
-                            <a href="#" onClick={(e) => { e.preventDefault(); setPage('toolkit'); }} className="hover:text-teal-600">The Toolkit</a>
+                        <div className="space-x-6 mb-4">
+                            <a href="#" onClick={(e) => { e.preventDefault(); onHomeClick(); }} className="hover:text-teal-600 transition-colors">Home</a>
+                            <a href="#" onClick={(e) => { e.preventDefault(); setPage('toolkit'); }} className="hover:text-teal-600 transition-colors">The Toolkit</a>
                         </div>
+                        <a href="https://buymeacoffee.com/fushaconnect" target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 font-semibold transition-colors">
+                            ☕ Support Our Mission
+                        </a>
                     </div>
                 </footer>
             );
