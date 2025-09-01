@@ -27,14 +27,29 @@
         
         async function initializeFirebase() {
             try {
-                // Fetch Firebase config from Netlify Function
-                const response = await fetch('/.netlify/functions/get-firebase-config');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                // Check if we're on localhost (development) or production
+                const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
                 
-                const config = await response.json();
-                const { firebaseConfig, collections: collectionsConfig } = config;
+                let firebaseConfig, collectionsConfig;
+                
+                if (isLocalhost) {
+                    // Use local config for development
+                    console.log('🔄 Using local Firebase config for development...');
+                    const localConfig = await import('./config.js');
+                    firebaseConfig = localConfig.firebaseConfig;
+                    collectionsConfig = localConfig.collections;
+                } else {
+                    // Use Netlify Function for production
+                    console.log('🔄 Using Netlify Function for production...');
+                    const response = await fetch('/.netlify/functions/get-firebase-config');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const config = await response.json();
+                    firebaseConfig = config.firebaseConfig;
+                    collectionsConfig = config.collections;
+                }
                 
                 // Initialize Firebase with secure config
                 app = initializeApp(firebaseConfig);
