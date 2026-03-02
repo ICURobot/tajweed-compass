@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -131,75 +131,147 @@
     </script>
     
     <style>
-        /* Glassmorphism Design System */
         :root {
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
+            --tc-bg: #f5f8f2;
+            --tc-bg-soft: #f0f6ec;
+            --tc-card: #ffffff;
+            --tc-text: #10221a;
+            --tc-muted: #4e6358;
+            --tc-accent: #1b8d6f;
+            --tc-accent-dark: #12634e;
+            --tc-gold: #b8892c;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Manrope', sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #FDFBF7 0%, #f0f9ff 25%, #ecfdf5 50%, #fef7ff 75%, #FDFBF7 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            color: var(--tc-text);
+            background:
+                radial-gradient(circle at 12% 18%, #d9f0e5 0%, transparent 42%),
+                radial-gradient(circle at 86% 14%, #fbe9c7 0%, transparent 38%),
+                linear-gradient(165deg, var(--tc-bg) 0%, var(--tc-bg-soft) 60%, #eef5ea 100%);
+            background-attachment: fixed;
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .font-lora { font-family: 'Cormorant Garamond', serif; }
+        .prose h1, .prose h2, .prose h3 { font-family: 'Cormorant Garamond', serif; }
+
+        .shell {
+            width: min(1120px, calc(100% - 1.5rem));
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .font-lora { font-family: 'Lora', serif; }
-        .prose h1, .prose h2, .prose h3 { font-family: 'Lora', serif; }
+        .surface {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(16, 34, 26, 0.08);
+            box-shadow: 0 10px 30px rgba(17, 40, 31, 0.08);
+            backdrop-filter: blur(8px);
+        }
 
-        /* Colorful roadmap cards - solid colors matching live site */
+        .fade-in-up {
+            animation: fadeInUp 700ms ease-out both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-kicker {
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.72rem;
+            color: var(--tc-accent-dark);
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 8vw, 4.75rem);
+            line-height: 0.95;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.8vw, 1.28rem);
+            color: var(--tc-muted);
+        }
+
+        .stat-pill {
+            border: 1px solid rgba(16, 34, 26, 0.12);
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 999px;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.82rem;
+            color: #234235;
+            font-weight: 600;
+        }
+
+        .roadmap-card {
+            border-radius: 1rem;
+            box-shadow: 0 16px 28px rgba(14, 42, 31, 0.12);
+            transition: transform 220ms ease, box-shadow 220ms ease;
+        }
+
+        .roadmap-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 34px rgba(14, 42, 31, 0.16);
+        }
+
         .roadmap-card-1 {
-            background: #E3F2FD; /* Light blue */
-            border: 2px solid #2196F3;
+            background: #e6f4ee;
+            border: 2px solid #1b8d6f;
         }
 
         .roadmap-card-2 {
-            background: #E8F5E8; /* Light green */
-            border: 2px solid #4CAF50;
+            background: #f4f9e8;
+            border: 2px solid #78a53a;
         }
 
         .roadmap-card-3 {
-            background: #FFF8E1; /* Light yellow */
-            border: 2px solid #FFC107;
+            background: #fef6e3;
+            border: 2px solid #e0a219;
         }
 
         .roadmap-card-4 {
-            background: #FCE4EC; /* Light pink */
-            border: 2px solid #E91E63;
+            background: #f7ece2;
+            border: 2px solid #c47b3c;
         }
 
         .roadmap-card-5 {
-            background: #E8EAF6; /* Light purple */
-            border: 2px solid #3F51B5;
+            background: #e6f1f4;
+            border: 2px solid #2f7f94;
         }
 
         .roadmap-card-6 {
-            background: #FCE4EC; /* Light pink */
-            border: 2px solid #E91E63;
+            background: #eef8f3;
+            border: 2px solid #4a9a79;
         }
 
         .roadmap-card-7 {
-            background: #E8EAF6; /* Light purple */
-            border: 2px solid #3F51B5;
+            background: #f6f2e7;
+            border: 2px solid #b8892c;
         }
 
         .roadmap-card-8 {
-            background: #E0F2F1; /* Light teal */
-            border: 2px solid #009688;
+            background: #e8f4fb;
+            border: 2px solid #327ca3;
         }
 
         .roadmap-card-9 {
-            background: #F3E5F5; /* Light lime green */
-            border: 2px solid #8BC34A;
+            background: #ebf2e4;
+            border: 2px solid #5f9041;
+        }
+
+        @media (max-width: 768px) {
+            .surface-mobile-flat {
+                border-radius: 1rem !important;
+            }
         }
     </style>
 </head>
@@ -230,11 +302,11 @@
             if (!lesson) return null;
             return (
                 <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4" onClick={onClose}>
-                    <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                    <div className="surface surface-mobile-flat rounded-2xl p-5 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                         <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
                         <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                            <button onClick={() => onShowDetails(lesson.lessonId)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 w-full">Read Full Lesson</button>
-                            <button onClick={onClose} className="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 w-full">Close</button>
+                            <button onClick={() => onShowDetails(lesson.lessonId)} className="bg-emerald-700 text-white px-6 py-2 rounded-lg hover:bg-emerald-800 w-full font-semibold">Read Full Lesson</button>
+                            <button onClick={onClose} className="bg-slate-200 text-slate-800 px-6 py-2 rounded-lg hover:bg-slate-300 w-full font-semibold">Close</button>
                         </div>
                     </div>
                 </div>
@@ -244,17 +316,17 @@
         function DetailPage({ lesson, onBack }) {
             return (
                 <div className="min-h-screen">
-                    <div className="container mx-auto px-6 py-12">
-                        <button onClick={onBack} className="bg-white text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 inline-flex items-center gap-2 mb-8 font-semibold transition-colors">
+                    <div className="shell py-8 sm:py-12">
+                        <button onClick={onBack} className="surface rounded-xl text-gray-800 px-4 py-2.5 hover:bg-white inline-flex items-center gap-2 mb-6 sm:mb-8 font-semibold transition-colors">
                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                            Back to Roadmap
                         </button>
                         {lesson ? (
-                            <div className="bg-white rounded-lg p-8">
+                            <div className="surface rounded-2xl p-5 sm:p-8">
                                 <div className="prose max-w-none lg:prose-lg" dangerouslySetInnerHTML={{ __html: lesson.content }}></div>
                             </div>
                         ) : (
-                            <div className="bg-white rounded-lg p-8 text-center">
+                            <div className="surface rounded-2xl p-8 text-center">
                                 <p className="text-gray-800">Loading lesson...</p>
                             </div>
                         )}
@@ -266,14 +338,14 @@
         function ToolkitPage({ toolkitItems }) {
             return (
                 <div className="min-h-screen">
-                    <div className="container mx-auto px-6 py-16">
+                    <div className="shell py-10 sm:py-16">
                         <div className="text-center mb-12">
-                            <div className="bg-white rounded-lg p-8 max-w-4xl mx-auto">
+                            <div className="surface rounded-2xl p-6 sm:p-8 max-w-4xl mx-auto">
                                 <h1 className="font-lora text-4xl md:text-5xl font-bold text-gray-800 mb-3">The Tajweed Toolkit</h1>
-                                <p className="text-lg text-gray-600 max-w-3xl mx-auto">Your dashboard of "cheatsheets" for when you need an answer fast. Perfect for quick reference during practice.</p>
+                                <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">Your dashboard of "cheatsheets" for when you need an answer fast. Perfect for quick reference during practice.</p>
                             </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
                             {toolkitItems.map(item => <ToolkitCard key={item.id} item={item} />)}
                         </div>
                     </div>
@@ -284,7 +356,7 @@
         function ToolkitCard({ item }) {
             const parsedContent = (content) => { try { return JSON.parse(content); } catch (e) { return null; } };
             return (
-                <div className="bg-white rounded-lg p-6 h-full flex flex-col shadow-lg">
+                <div className="surface rounded-xl p-6 h-full flex flex-col">
                     <h3 className="font-lora text-xl font-bold text-gray-800 mb-4">{item.title}</h3>
                     <div className="flex-grow">
                         {item.type === 'letterChart' && (
@@ -342,25 +414,25 @@
 
         function Header({ setPage, onBack, showBackButton }) {
             return (
-                <header className="bg-white sticky top-0 z-40 m-4 rounded-2xl shadow-lg">
-                    <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+                <header className="surface sticky top-2 sm:top-3 z-40 mx-3 sm:mx-4 mt-3 sm:mt-4 rounded-2xl">
+                    <nav className="shell px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 sm:items-center">
                          {showBackButton ? (
-                                                      <button onClick={onBack} className="font-lora text-2xl font-bold text-gray-800 cursor-pointer hover:text-teal-600 transition-colors flex items-center gap-3">
+                                                      <button onClick={onBack} className="font-lora text-xl sm:text-2xl font-bold text-gray-800 cursor-pointer hover:text-emerald-700 transition-colors flex items-center gap-2.5 text-left">
                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                             <img src="tajweed-compass-logo.png" alt="Tajweed Compass Logo" className="h-12 w-auto" />
+                             <img src="tajweed-compass-logo.png" alt="Tajweed Compass Logo" className="h-10 sm:h-12 w-auto" />
                              The Tajweed Compass
                          </button>
                      ) : (
-                         <div className="font-lora text-2xl font-bold text-gray-800 cursor-pointer hover:text-teal-600 transition-colors flex items-center gap-3" onClick={() => setPage('home')}>
-                             <img src="tajweed-compass-logo.png" alt="Tajweed Compass Logo" className="h-12 w-auto" />
+                         <div className="font-lora text-xl sm:text-2xl font-bold text-gray-800 cursor-pointer hover:text-emerald-700 transition-colors flex items-center gap-2.5" onClick={() => setPage('home')}>
+                             <img src="tajweed-compass-logo.png" alt="Tajweed Compass Logo" className="h-10 sm:h-12 w-auto" />
                              The Tajweed Compass
                          </div>
                      )}
-                        <div className="flex items-center gap-3">
-                            <button onClick={() => setPage('toolkit')} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                        <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+                            <button onClick={() => setPage('toolkit')} className="bg-emerald-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-emerald-800 font-semibold w-full sm:w-auto">
                                 The Toolkit
                             </button>
-                            <a href="https://buymeacoffee.com/fushaconnect" target="_blank" rel="noopener noreferrer" className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 font-semibold transition-colors">
+                            <a href="https://buymeacoffee.com/fushaconnect" target="_blank" rel="noopener noreferrer" className="bg-amber-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-amber-700 font-semibold transition-colors w-full sm:w-auto text-center">
                                 ☕ Support Us
                             </a>
                         </div>
@@ -378,10 +450,11 @@
             const cardColorClass = cardColors[index % cardColors.length];
             
             return (
-                <div className="roadmap-item w-full max-w-md mx-auto">
-                    <div className="relative">
-                        <div className={`${cardColorClass} rounded-lg p-6 md:p-8 shadow-lg transition-transform hover:scale-105 duration-300 cursor-pointer`} onClick={() => onStepClick(step.id)}>
-                            <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{`Step ${index + 1}: ${step.title}`}</h3>
+                <div className="w-full">
+                    <div className="relative h-full">
+                        <div className={`${cardColorClass} roadmap-card h-full p-5 md:p-7 cursor-pointer`} onClick={() => onStepClick(step.id)}>
+                            <p className="text-xs font-extrabold tracking-[0.12em] uppercase text-gray-600 mb-2">Step {index + 1}</p>
+                            <h3 className="font-lora text-2xl md:text-3xl font-bold text-gray-800 mb-3">{step.title}</h3>
                             <p className="text-gray-600 mb-4">{step.description}</p>
                             <ul className="space-y-2">{step.lessons.map((lesson, i) => (
                                 <li key={i} className="flex items-start">
@@ -401,34 +474,47 @@
              const scrollToRoadmap = () => document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' });
             return (
                 <div>
-                    <div className="text-center py-20 md:py-32 px-6">
-                        <div className="bg-white rounded-lg max-w-4xl mx-auto p-12 mb-8 shadow-lg">
-                            <h1 className="font-lora text-4xl md:text-6xl font-bold text-gray-800 mb-4">Recite with Confidence.</h1>
-                            <h2 className="font-lora text-4xl md:text-6xl font-bold text-teal-600 mb-6">Teach with Love.</h2>
-                            <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-8">Your family's simple, step-by-step guide to learning the art of Tajweed together.</p>
-                            <button onClick={scrollToRoadmap} className="bg-teal-600 text-white text-lg font-bold px-8 py-4 rounded-lg hover:bg-teal-700">
-                                Start Your Journey ↓
-                            </button>
+                    <section className="shell pt-10 sm:pt-14 md:pt-20 pb-10 sm:pb-14 fade-in-up">
+                        <div className="surface rounded-[1.75rem] p-6 sm:p-8 md:p-12">
+                            <div className="hero-kicker mb-3">Bismillah, begin with confidence</div>
+                            <h1 className="font-lora hero-title font-bold text-slate-900">Recite with confidence.</h1>
+                            <h2 className="font-lora hero-title font-bold text-emerald-700 mb-4 sm:mb-6">Teach with love.</h2>
+                            <p className="hero-subtitle max-w-2xl mb-6 sm:mb-8">Your family's practical, step-by-step guide to learning Tajweed together, from first letters to fluent recitation.</p>
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                                <button onClick={scrollToRoadmap} className="bg-emerald-700 text-white text-base sm:text-lg font-bold px-7 py-3.5 rounded-xl hover:bg-emerald-800 transition-colors">
+                                    Start Your Journey
+                                </button>
+                                <button onClick={() => onStepClick('step1')} className="border border-emerald-700 text-emerald-800 text-base sm:text-lg font-bold px-7 py-3.5 rounded-xl hover:bg-emerald-50 transition-colors">
+                                    Open Step 1
+                                </button>
+                            </div>
+                            <div className="flex flex-wrap gap-2.5 sm:gap-3">
+                                <span className="stat-pill">Always Free</span>
+                                <span className="stat-pill">Family Friendly</span>
+                                <span className="stat-pill">9 Structured Steps</span>
+                                <span className="stat-pill">Practical Lesson Flow</span>
+                            </div>
                         </div>
-                    </div>
-                    <div id="roadmap" className="container mx-auto px-6 py-16">
-                         <h2 className="font-lora text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Your Step-by-Step Roadmap to Recitation</h2>
-                        <div className="space-y-12 flex flex-col items-center">{roadmapSteps.map((step, index) => (<RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />))}</div>
-                    </div>
+                    </section>
+                    <section id="roadmap" className="shell py-8 sm:py-12 md:py-16">
+                         <h2 className="font-lora text-3xl md:text-5xl font-bold text-center text-gray-800 mb-3">Your Step-by-Step Roadmap</h2>
+                         <p className="text-center text-gray-600 text-base sm:text-lg max-w-2xl mx-auto mb-8 sm:mb-12">Each step opens a focused lesson summary, then the detailed lesson when you're ready.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">{roadmapSteps.map((step, index) => (<RoadmapStep key={step.id} step={step} index={index} onStepClick={onStepClick} />))}</div>
+                    </section>
                 </div>
             );
         }
 
         function Footer({ setPage, onHomeClick }) {
             return (
-                <footer className="bg-white mt-24 mx-4 rounded-2xl shadow-lg">
-                    <div className="container mx-auto px-6 py-8 text-center text-gray-600">
-                        <p className="font-lora text-lg mb-4">"Dedicated to making the science of Tajweed accessible to every family."</p>
-                        <div className="space-x-6 mb-4">
-                            <a href="#" onClick={(e) => { e.preventDefault(); onHomeClick(); }} className="hover:text-teal-600 transition-colors">Home</a>
-                            <a href="#" onClick={(e) => { e.preventDefault(); setPage('toolkit'); }} className="hover:text-teal-600 transition-colors">The Toolkit</a>
+                <footer className="surface mt-12 sm:mt-20 mx-3 sm:mx-4 mb-3 sm:mb-4 rounded-2xl">
+                    <div className="shell px-4 sm:px-6 py-7 sm:py-8 text-center text-gray-600">
+                        <p className="font-lora text-xl sm:text-2xl text-slate-700 mb-4">"Dedicated to making the science of Tajweed accessible to every family."</p>
+                        <div className="flex justify-center items-center gap-5 mb-5 text-sm sm:text-base">
+                            <a href="#" onClick={(e) => { e.preventDefault(); onHomeClick(); }} className="hover:text-emerald-700 transition-colors">Home</a>
+                            <a href="#" onClick={(e) => { e.preventDefault(); setPage('toolkit'); }} className="hover:text-emerald-700 transition-colors">The Toolkit</a>
                         </div>
-                        <a href="https://buymeacoffee.com/fushaconnect" target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 font-semibold transition-colors">
+                        <a href="https://buymeacoffee.com/fushaconnect" target="_blank" rel="noopener noreferrer" className="inline-block bg-amber-600 text-white px-6 py-3 rounded-lg hover:bg-amber-700 font-semibold transition-colors">
                             ☕ Support Our Mission
                         </a>
                     </div>
